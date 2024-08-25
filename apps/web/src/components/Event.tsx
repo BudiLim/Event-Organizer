@@ -41,7 +41,7 @@ export default function Event() {
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-center items-center pt-[75px] gap-1">
+                <div className="flex justify-center items-center py-[75px] gap-1">
                     <h1 className="font-semibold text-xl text-center">See More</h1>
                     <FiChevronRight size={20} />
                 </div>
