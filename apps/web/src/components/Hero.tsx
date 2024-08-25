@@ -1,9 +1,9 @@
 import Image from "next/image";
-import hero from "../assets/hero img.png"
+import hero from "../assets/hero_img.png"
 
 export default function Hero() {
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen shadow-md shadow-white">
       <Image 
       src={hero} 
       alt="hero" 
