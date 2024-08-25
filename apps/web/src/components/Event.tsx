@@ -1,6 +1,6 @@
 import Image from "next/image";
 import afgan from "../assets/afgan.png"
-import billie_eilish from "../assets/billie eilish.png"
+import billie_eilish from "../assets/billie_eilish.png"
 import hozier from "../assets/hozier.png"
 import { FiChevronRight } from "react-icons/fi";;
 
