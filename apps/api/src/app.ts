@@ -9,7 +9,7 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { LoginRouter } from './routers/login.router'; // Import the LoginRouter
 
 export default class App {
   private app: Express;
@@ -51,18 +51,18 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const loginRouter = new LoginRouter(); // Initialize the LoginRouter
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/auth', loginRouter.getRouter()); // Use the login router with the `/auth` path
   }
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
     });
   }
 }
