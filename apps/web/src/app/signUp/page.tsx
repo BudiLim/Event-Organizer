@@ -9,7 +9,6 @@ const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
-  const [company, setCompany] = useState('');
   const [userType, setUserType] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [isValid, setIsValid] = useState(true);
@@ -27,21 +26,23 @@ const Register: React.FC = () => {
       !firstName ||
       !lastName ||
       !phone ||
-      !company ||
       !userType ||
-      (userType === 'Music Experience' && !referralCode) || // Check referral code if userType is "Music Experience"
+      (userType === 'User Music Experience' && !referralCode) || // Check referral code if userType is "Music Experience"
       password !== repeatPassword
     ) {
       setIsValid(false);
       return;
     }
 
+    // Show success alert
+    alert('Registration successful!');
+
     // Proceed with redirect
     router.push('/login');
   };
 
   return (
-    <section className="relative pb-24 bg-slate-100">
+    <section className="relative mt-8 pb-2 bg-slate-100">
       <div className="relative flex justify-center pt-10 lg:pt-9">
         <div className="container">
           <div className="w-full px-4 lg:m-5 lg:mb-10 lg:mt-12">
@@ -159,25 +160,25 @@ const Register: React.FC = () => {
               </div>
 
               {/* Phone Fields */}
-                <div className="relative z-0 w-full mb-5 group">
-                  <input
-                    type="tel"
-                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                    name="floating_phone"
-                    id="floating_phone"
-                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
-                    placeholder=" "
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                  <label
-                    htmlFor="floating_phone"
-                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >
-                    Phone (123-456-7890)
-                  </label>
-                </div>
+              <div className="relative z-0 w-full mb-5 group">
+                <input
+                  type="tel"
+                  pattern="[0-9]{10,13}"
+                  name="floating_phone"
+                  id="floating_phone"
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
+                  placeholder=" "
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                <label
+                  htmlFor="floating_phone"
+                  className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                >
+                  Phone (e.g., 081234567890)
+                </label>
+              </div>
 
               {/* User Type Dropdown */}
               <div className="relative z-0 w-full mb-5 group">
