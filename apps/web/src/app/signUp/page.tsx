@@ -10,6 +10,7 @@ const Register: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
+  const [userType, setUserType] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [isValid, setIsValid] = useState(true);
 
@@ -27,6 +28,8 @@ const Register: React.FC = () => {
       !lastName ||
       !phone ||
       !company ||
+      !userType ||
+      (userType === 'Music Experience' && !referralCode) || // Check referral code if userType is "Music Experience"
       password !== repeatPassword
     ) {
       setIsValid(false);
@@ -54,6 +57,7 @@ const Register: React.FC = () => {
           {/* --start-- */}
           <div className="m-8">
             <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
+              {/* Email Field */}
               <div className="relative z-0 w-full mb-5 group">
                 <input
                   type="email"
@@ -72,6 +76,8 @@ const Register: React.FC = () => {
                   Email address
                 </label>
               </div>
+
+              {/* Password Fields */}
               <div className="relative z-0 w-full mb-5 group">
                 <input
                   type="password"
@@ -111,6 +117,8 @@ const Register: React.FC = () => {
                   <p className="text-red-500 text-sm">Passwords do not match</p>
                 )}
               </div>
+
+              {/* First Name and Last Name Fields */}
               <div className="grid md:grid-cols-2 md:gap-6">
                 <div className="relative z-0 w-full mb-5 group">
                   <input
@@ -149,10 +157,12 @@ const Register: React.FC = () => {
                   </label>
                 </div>
               </div>
-              <div className="grid md:grid-cols-2 md:gap-6">
+
+              {/* Phone Fields */}
                 <div className="relative z-0 w-full mb-5 group">
                   <input
                     type="tel"
+                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                     name="floating_phone"
                     id="floating_phone"
                     className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
@@ -165,55 +175,74 @@ const Register: React.FC = () => {
                     htmlFor="floating_phone"
                     className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >
-                    Phone number
+                    Phone (123-456-7890)
                   </label>
                 </div>
-                <div className="relative z-0 w-full mb-5 group">
-                  <input
-                    type="text"
-                    name="floating_company"
-                    id="floating_company"
-                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
-                    placeholder=" "
-                    required
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                  />
-                  <label
-                    htmlFor="floating_company"
-                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >
-                    Company (Ex. Google)
-                  </label>
-                </div>
-              </div>
+
+              {/* User Type Dropdown */}
               <div className="relative z-0 w-full mb-5 group">
-                <input
-                  type="text"
-                  name="floating_referral_code"
-                  id="floating_referral_code"
+                <select
+                  id="UserType"
+                  required
                   className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
-                  placeholder=" "
-                  value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                />
+                  value={userType}
+                  onChange={(e) => setUserType(e.target.value)}
+                >
+                  <option disabled value="">
+                    What is your interest?
+                  </option>
+                  <option value="User Music Experience">
+                    Music Experience
+                  </option>
+                  <option value="Event Organizer">Event Organizer</option>
+                </select>
                 <label
-                  htmlFor="floating_referral_code"
+                  htmlFor="UserType"
                   className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
-                  Referral Code
+                  User Type
                 </label>
               </div>
 
+              {/* Referral Code Field (Conditional) */}
+              {userType === 'User Music Experience' && (
+                <div className="relative z-0 w-full mb-5 group">
+                  <input
+                    type="text"
+                    name="referral_code"
+                    id="referral_code"
+                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
+                    placeholder=" "
+                    value={referralCode.toUpperCase()}
+                    onChange={(e) =>
+                      setReferralCode(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <label
+                    htmlFor="referral_code"
+                    className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-Dark-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  >
+                    Referral Code
+                  </label>
+                </div>
+              )}
+
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="text-white bg-Dark-blue hover:bg-[#384390] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                className="text-white bg-Dark-blue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Register
               </button>
+
+              {!isValid && (
+                <p className="text-red-500 text-sm mt-2">
+                  Please fill in all fields correctly.
+                </p>
+              )}
             </form>
           </div>
-          {/* --end-- */}
         </div>
       </div>
     </section>
