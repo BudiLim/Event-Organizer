@@ -26,12 +26,12 @@ const LoginID: React.FC = () => {
   };
 
   return (
-    <section className="relative pb-24 bg-slate-100">
+    <section className="relative mt-9 pb-44 bg-slate-100">
       <div className="relative flex justify-center pt-10 lg:pt-9">
         <div className="container">
           <div className="w-full px-4 lg:m-5 lg:mb-10 lg:mt-12">
             <div className="max-w-full mx-auto text-center mb-3 lg:pr-9 w-full lg:w-1/2">
-              <h4 className="font-bold bg-gradient-to-br mt-10 text-slate-900 text-2xl mb-8 md:font-bold lg:text-2xl">
+              <h4 className="font-semibold bg-gradient-to-br text-dark1 text-2xl md:font-bold lg:text-2xl">
                 Log in using your account
               </h4>
             </div>
