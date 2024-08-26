@@ -80,14 +80,16 @@ export default function Navbar() {
       </div>
 
       <div className="flex gap-[30px] items-center text-sm">
+        <>
+          <Link href={'/'} className="text-white font-semibold">
+            Category
+          </Link>
+          <Link href={'/'} className="text-white font-semibold">
+            Create Event
+          </Link>
+        </>
         {!loggedIn ? (
           <>
-            <Link href={'/'} className="text-white font-semibold">
-              Category
-            </Link>
-            <Link href={'/'} className="text-white font-semibold">
-              Create Event
-            </Link>
             <Link href={'/login'}>
               <button className="bg-white text-black w-[80px] h-[30px] rounded-full">
                 Login
@@ -101,7 +103,11 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <div className="relative flex items-center" ref={profileRef} onClick={handleDropdownToggle}>
+            <div
+              className="relative flex items-center"
+              ref={profileRef}
+              onClick={handleDropdownToggle}
+            >
               <Image
                 src={profile}
                 alt="Profile"
@@ -109,7 +115,10 @@ export default function Navbar() {
                 height={35}
                 className="cursor-pointer"
               />
-              <span className="text-white ml-2 cursor-pointer">{userEmail}</span> {/* Display user email */}
+              <span className="text-white ml-2 cursor-pointer">
+                {userEmail}
+              </span>{' '}
+              {/* Display user email */}
               {isDropdownOpen && (
                 <div
                   ref={dropdownRef}
