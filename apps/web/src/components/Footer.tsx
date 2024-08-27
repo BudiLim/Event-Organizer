@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <div className="bg-gradient-to-r from-black via-[#262626] to-black h-full">
+    <div className=" bg-gradient-to-r from-black via-[#262626] to-black h-full">
       <div className="flex flex-col justify-center items-center h-full">
         <div className="flex flex-col gap-6 py-7 text-center  text-[9px] md:gap-48 md:flex-row md:text-left lg:gap-64 ">
           <div className="text-[#d9d9d9] text-[9px]">

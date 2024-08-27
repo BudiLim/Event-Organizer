@@ -52,7 +52,7 @@ export default function Event() {
             
 
             <div className="flex text-xl text-[#d9d9d9] font-medium hover:font-bold hover:text-white items-center pt-[75px] pb-[50px]">
-                <Link href={'/'}>See More</Link>
+                <Link href={'/login'}>See More</Link>
                 <FiChevronRight />
             </div>
         </div>

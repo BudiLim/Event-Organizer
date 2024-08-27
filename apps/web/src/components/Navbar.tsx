@@ -34,6 +34,15 @@ export default function Navbar() {
     }
   };
 
+
+  useEffect(() => {
+    if (loggedIn) {
+      // Redirect to another page if logged in
+      router.push('/landing_page');
+    }
+  }, [loggedIn]);
+
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -46,14 +55,8 @@ export default function Navbar() {
     router.push('/'); // Redirect to homepage
   };
 
-  const [nav, setNav] = useState(false)
-
-  const handleNav = () => {
-      setNav(!nav)
-  }
-
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black h-[60px] px-[40px]">
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black bg-opacity-70 h-[60px] px-[40px]">
       <div className="flex items-center">
         <Link href="/">
           <Image src={logo} alt="logo" width={35} height={35} />
@@ -127,18 +130,21 @@ export default function Navbar() {
                   className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg w-48 text-black z-50"
                 >
                   <ul className="py-2">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li className="px-4 py-2 hover:underline cursor-pointer">
                       <Link href="/my-ticket">My Ticket</Link>
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li className="px-4 py-2 hover:underline cursor-pointer">
                       <Link href="/my-event">My Event</Link>
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li className="px-4 py-2 hover:underline cursor-pointer">
+                      <Link href="/my-dashboard">My Dashboard</Link>
+                    </li>
+                    <li className="px-4 py-2 hover:underline cursor-pointer">
                       <Link href="/account-settings">Account Settings</Link>
                     </li>
                     <hr className="my-1 border-gray-300" />
                     <li
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className="px-4 py-2 hover:underline cursor-pointer"
                       onClick={handleSignOut} // Call handleSignOut on click
                     >
                       Sign Out
