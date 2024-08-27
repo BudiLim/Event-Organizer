@@ -5,3 +5,8 @@
 body {
     background: #101010;
 }
+
+/* styles/globals.css */
+html {
+    scroll-behavior: smooth;
+  }
