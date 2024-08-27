@@ -1,9 +1,11 @@
 'use client';
-
+import {AiOutlineClose, AiOutlineMenu} from 'react-icons/ai'
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { HiCurrencyDollar } from "react-icons/hi";
+import coin from '../assets/Coin.png'
 import logo from '../assets/logo.png';
-import profile from '../assets/ProfileIcon.png';
+import { FiUser } from "react-icons/fi";
 import Link from 'next/link';
 import { FiSearch, FiMapPin } from 'react-icons/fi';
 import { useAuth } from '@/app/AuthContext'; // Import useAuth
@@ -32,6 +34,15 @@ export default function Navbar() {
     }
   };
 
+
+  useEffect(() => {
+    if (loggedIn) {
+      // Redirect to another page if logged in
+      router.push('/landing_page');
+    }
+  }, [loggedIn]);
+
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -45,14 +56,15 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black h-[60px] px-[40px]">
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black bg-opacity-70 h-[60px] px-[40px]">
       <div className="flex items-center">
         <Link href="/">
           <Image src={logo} alt="logo" width={35} height={35} />
         </Link>
       </div>
-      <div className="flex gap-[30px] items-center text-sm">
-        {/* Search Bar */}
+
+      <div className="flex gap-[30px] items-center text-[15px]">
+        <>
         <div className="relative w-[200px] h-[30px]">
           <input
             type="text"
@@ -65,7 +77,6 @@ export default function Navbar() {
           />
         </div>
 
-        {/* Location Bar */}
         <div className="relative w-[200px] h-[30px]">
           <input
             type="text"
@@ -77,44 +88,38 @@ export default function Navbar() {
             size={16}
           />
         </div>
-      </div>
-
-      <div className="flex gap-[30px] items-center text-sm">
-        <>
-          <Link href={'/'} className="text-white font-semibold">
+          <Link href={'/'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105  hover:text-white">
             Category
           </Link>
-          <Link href={'/'} className="text-white font-semibold">
+          <Link href={'/'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
             Create Event
           </Link>
         </>
         {!loggedIn ? (
           <>
             <Link href={'/login'}>
-              <button className="bg-white text-black w-[80px] h-[30px] rounded-full">
+              <button className="bg-white text-black w-[80px] h-[30px] rounded-full hover:font-extrabold">
                 Login
               </button>
             </Link>
             <Link href={'/signUp'}>
-              <button className="bg-white text-black w-[80px] h-[30px] rounded-full">
+              <button className="bg-white text-black w-[80px] h-[30px] rounded-full hover:font-extrabold">
                 Sign Up
               </button>
             </Link>
           </>
         ) : (
           <>
+            <div className='flex justify-center items-center gap-1'>
+              <HiCurrencyDollar color='yellow' size={20}/>
+              <h1 className='font-bold text-white'>10.000</h1>
+            </div>
             <div
-              className="relative flex items-center"
+              className="relative flex items-center border-[1px] py-2 px-4 rounded-full"
               ref={profileRef}
               onClick={handleDropdownToggle}
             >
-              <Image
-                src={profile}
-                alt="Profile"
-                width={35}
-                height={35}
-                className="cursor-pointer"
-              />
+             <FiUser color='white' size={20}/>
               <span className="text-white ml-2 cursor-pointer">
                 {userEmail}
               </span>{' '}
@@ -150,7 +155,10 @@ export default function Navbar() {
             </div>
           </>
         )}
+
       </div>
     </div>
   );
 }
+
+            
