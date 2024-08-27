@@ -26,12 +26,12 @@ const LoginID: React.FC = () => {
   };
 
   return (
-    <section className="relative mt-9 pb-44 bg-slate-100">
+    <section className="relative h-screen flex justify-center ">
       <div className="relative flex justify-center pt-10 lg:pt-9">
         <div className="container">
           <div className="w-full px-4 lg:m-5 lg:mb-10 lg:mt-12">
-            <div className="max-w-full mx-auto text-center mb-3 lg:pr-9 w-full lg:w-1/2">
-              <h4 className="font-semibold bg-gradient-to-br text-dark1 text-2xl md:font-bold lg:text-2xl">
+            <div className="w-full ">
+              <h4 className="font-semibold bg-gradient-to-br text-white text-2xl md:font-bold lg:text-2xl">
                 Log in using your account
               </h4>
             </div>
@@ -103,11 +103,11 @@ const LoginID: React.FC = () => {
             </form>
           </div>
           {/* --end-- */}
-          <div className="mx-auto text-center lg:pr-9 w-full lg:w-1/2">
-            <h5 className="font-normal bg-gradient-to-br mt-6 text-gray-600 text-sm lg:text-sm">
+          <div className="mx-auto flex justify-center ">
+            <h5 className="font-normal bg-gradient-to-br mt-6 text-gray-300 text-sm lg:text-sm">
               Don&apos;t have an account ?{" "}
               <Link href={"/signUp"}>
-                <span className="text-black font-bold hover:underline hover:text-blue-600">Register Here</span>
+                <span className="text-white font-bold hover:underline hover:text-blue-600">Register Here</span>
               </Link>
             </h5>
           </div>
