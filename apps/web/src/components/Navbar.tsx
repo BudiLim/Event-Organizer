@@ -1,22 +1,23 @@
 'use client';
-import {AiOutlineClose, AiOutlineMenu} from 'react-icons/ai'
+import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { HiCurrencyDollar } from "react-icons/hi";
-import coin from '../assets/Coin.png'
+import coin from '../assets/Coin.png';
 import logo from '../assets/logo.png';
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiSearch, FiMapPin } from "react-icons/fi";
 import Link from 'next/link';
-import { FiSearch, FiMapPin } from 'react-icons/fi';
 import { useAuth } from '@/app/AuthContext'; // Import useAuth
 import { useRouter } from 'next/navigation'; // Import useRouter for redirection
+import axios from 'axios';
 
 export default function Navbar() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const { loggedIn, userEmail, logout } = useAuth(); // Get loggedIn state, userEmail, and logout function
+  const { loggedIn, userEmail, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const profileRef = useRef<HTMLDivElement | null>(null); // Change ref to div
-  const router = useRouter(); // Use router for navigation
+  const profileRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+  const [userType, setUserType] = useState<string | null>(null);
 
   const handleDropdownToggle = () => {
     setDropdownOpen((prev) => !prev);
@@ -34,14 +35,11 @@ export default function Navbar() {
     }
   };
 
-
   useEffect(() => {
     if (loggedIn) {
-      // Redirect to another page if logged in
       router.push('/landing_page');
     }
   }, [loggedIn]);
-
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -49,6 +47,20 @@ export default function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isDropdownOpen]);
+
+  useEffect(() => {
+    if (loggedIn) {
+      const fetchUserType = async () => {
+        try {
+          const response = await axios.get('/api/getUserType', { params: { email: userEmail } });
+          setUserType(response.data.userType);
+        } catch (error) {
+          console.error('Error fetching user type:', error);
+        }
+      };
+      fetchUserType();
+    }
+  }, [loggedIn, userEmail]);
 
   const handleSignOut = () => {
     logout(); // Clear authentication state
@@ -58,13 +70,12 @@ export default function Navbar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black bg-opacity-70 h-[60px] px-[40px]">
       <div className="flex items-center">
-        <Link href="/">
+        <Link href={loggedIn ? '/landing_page' : '/'}>
           <Image src={logo} alt="logo" width={35} height={35} />
         </Link>
       </div>
 
       <div className="flex gap-[30px] items-center text-[15px]">
-        <>
         <div className="relative w-[200px] h-[30px]">
           <input
             type="text"
@@ -88,13 +99,19 @@ export default function Navbar() {
             size={16}
           />
         </div>
-          <Link href={'/'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105  hover:text-white">
+
+        {/* Conditional Rendering for Buttons */}
+        {userType !== 'Event Organizer' && (
+          <Link href={'/landing_page#category'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
             Category
           </Link>
-          <Link href={'/'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
+        )}
+        {userType === 'Event Organizer' && (
+          <Link href={'/create-event'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
             Create Event
           </Link>
-        </>
+        )}
+
         {!loggedIn ? (
           <>
             <Link href={'/login'}>
@@ -119,33 +136,34 @@ export default function Navbar() {
               ref={profileRef}
               onClick={handleDropdownToggle}
             >
-             <FiUser color='white' size={20}/>
+              <FiUser color='white' size={20}/>
               <span className="text-white ml-2 cursor-pointer">
                 {userEmail}
-              </span>{' '}
-              {/* Display user email */}
+              </span>
+
               {isDropdownOpen && (
                 <div
                   ref={dropdownRef}
                   className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg w-48 text-black z-50"
                 >
                   <ul className="py-2">
-                    <li className="px-4 py-2 hover:underline cursor-pointer">
-                      <Link href="/my-ticket">My Ticket</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:underline cursor-pointer">
-                      <Link href="/my-event">My Event</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:underline cursor-pointer">
-                      <Link href="/my-dashboard">My Dashboard</Link>
-                    </li>
+                    {userType === 'Event Organizer' && (
+                      <>
+                        <li className="px-4 py-2 hover:underline cursor-pointer">
+                          <Link href="/my-event">My Event</Link>
+                        </li>
+                        <li className="px-4 py-2 hover:underline cursor-pointer">
+                          <Link href="/my-dashboard">My Dashboard</Link>
+                        </li>
+                      </>
+                    )}
                     <li className="px-4 py-2 hover:underline cursor-pointer">
                       <Link href="/account-settings">Account Settings</Link>
                     </li>
                     <hr className="my-1 border-gray-300" />
                     <li
                       className="px-4 py-2 hover:underline cursor-pointer"
-                      onClick={handleSignOut} // Call handleSignOut on click
+                      onClick={handleSignOut}
                     >
                       Sign Out
                     </li>
@@ -160,5 +178,3 @@ export default function Navbar() {
     </div>
   );
 }
-
-            
