@@ -26,7 +26,9 @@ export default function LandingPage() {
                     layout="fill"
                     objectFit="cover" />
             </div>
-            <div className="flex flex-col items-center text-white">
+            <div id="category" className="flex flex-col items-center text-white">
+
+            <h1 className="text-[35px] text-white font-medium py-[35px]">Music Events <span className="font-bold">Category</span> </h1>
 
                 {/* single band */}
 
