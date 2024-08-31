@@ -55,9 +55,7 @@ export default function Event() {
                 <Link href={'/login'}>See More</Link>
                 <FiChevronRight />
             </div>
-        </div>
-    
-            
+        </div>       
     )
 }
 

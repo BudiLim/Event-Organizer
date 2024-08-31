@@ -1,180 +1,68 @@
-'use client';
-import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { HiCurrencyDollar } from "react-icons/hi";
-import coin from '../assets/Coin.png';
-import logo from '../assets/logo.png';
-import { FiUser, FiSearch, FiMapPin } from "react-icons/fi";
-import Link from 'next/link';
-import { useAuth } from '@/app/AuthContext'; // Import useAuth
-import { useRouter } from 'next/navigation'; // Import useRouter for redirection
-import axios from 'axios';
+'use client'
+import { useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import Image from "next/image";
+import logo from "../assets/logo.png";
+import SearchInput from "@/app/search-bar/page";
+import Link from "next/link";
+import LoginSignUp from "@/app/login-signup/page";
+import { FiMenu, FiX } from "react-icons/fi";
 
-export default function Navbar() {
-  const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const { loggedIn, userEmail, logout } = useAuth();
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const profileRef = useRef<HTMLDivElement | null>(null);
-  const router = useRouter();
-  const [userType, setUserType] = useState<string | null>(null);
+const Navbar = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleDropdownToggle = () => {
-    setDropdownOpen((prev) => !prev);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      isDropdownOpen &&
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node) &&
-      profileRef.current &&
-      !profileRef.current.contains(event.target as Node)
-    ) {
-      setDropdownOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    if (loggedIn) {
-      router.push('/landing_page');
-    }
-  }, [loggedIn]);
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isDropdownOpen]);
-
-  useEffect(() => {
-    if (loggedIn) {
-      const fetchUserType = async () => {
-        try {
-          const response = await axios.get('/api/getUserType', { params: { email: userEmail } });
-          setUserType(response.data.userType);
-        } catch (error) {
-          console.error('Error fetching user type:', error);
-        }
-      };
-      fetchUserType();
-    }
-  }, [loggedIn, userEmail]);
-
-  const handleSignOut = () => {
-    logout(); // Clear authentication state
-    router.push('/'); // Redirect to homepage
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between bg-black bg-opacity-70 h-[60px] px-[40px]">
-      <div className="flex items-center">
-        <Link href={loggedIn ? '/landing_page' : '/'}>
-          <Image src={logo} alt="logo" width={35} height={35} />
+    <div className="fixed flex justify-between top-0 z-10 h-[60px] w-full px-[20px] lg:px-[40px] bg-black bg-opacity-70">
+      <div className="flex items-center h-full">
+        <Link href={'/'}>
+          <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
         </Link>
       </div>
 
-      <div className="flex gap-[30px] items-center text-[15px]">
-        <div className="relative w-[200px] h-[30px]">
-          <input
-            type="text"
-            placeholder="Search Events"
-            className="text-white bg-black border border-white w-full h-full rounded-full text-sm text-center pl-8 pr-4"
-          />
-          <FiSearch
-            className="text-white absolute top-1/2 left-2 transform -translate-y-1/2 z-10"
-            size={16}
-          />
+      <div className="lg:hidden flex h-full items-center gap-[15px]">
+        <SearchInput/>
+        <FiMenu size={30} color="white" onClick={toggleSidebar} />
+      </div>
+
+      <div className="hidden lg:flex h-full items-center gap-[30px]">
+        <SearchInput />
+
+        {/* Category dropdown */}
+        <div className="flex items-center">
+          <div className="dropdown dropdown-hover">
+            <div tabIndex={1} role="button" className="bg-transparent font-semibold text-[15px] text-white hover:scale-105">Category</div>
+            <ul tabIndex={1} className="dropdown-content menu bg-[#101010] text-white font-medium rounded-md w-[140px]">
+              <li><Link href={'/'} className="hover:scale-105">Single Band</Link></li>
+              <li><Link href={'/'} className="hover:scale-105">Group Band</Link></li>
+              <li><Link href={'/'} className="hover:scale-105">Disc Jockey</Link></li>
+            </ul>
+          </div>
         </div>
 
-        <div className="relative w-[200px] h-[30px]">
-          <input
-            type="text"
-            placeholder="Location"
-            className="text-white bg-black border border-white w-full h-full rounded-full text-sm text-center pl-8 pr-4"
-          />
-          <FiMapPin
-            className="text-white absolute top-1/2 left-2 transform -translate-y-1/2 z-10"
-            size={16}
-          />
+        <Link href={'/'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
+
+        <LoginSignUp />
+      </div>
+
+      {/* Sidebar */}
+      <div className={`fixed top-0 left-0 h-full w-[250px] bg-[#101010] transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-20`}>
+        <div className="flex justify-between items-center p-4">
+          <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
+          <FiX size={30} color="white" onClick={toggleSidebar} />
         </div>
-
-        {/* Conditional Rendering for Buttons */}
-        {userType !== 'Event Organizer' && (
-          <Link href={'/landing_page#category'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
-            Category
-          </Link>
-        )}
-        {userType === 'Event Organizer' && (
-          <Link href={'/create-event'} className="text-[#d9d9d9] font-medium transition-transform duration-300 hover:font-bold hover:scale-105 hover:text-white">
-            Create Event
-          </Link>
-        )}
-
-        {!loggedIn ? (
-          <>
-            <Link href={'/login'}>
-              <button className="bg-white text-black w-[80px] h-[30px] rounded-full hover:font-extrabold">
-                Login
-              </button>
-            </Link>
-            <Link href={'/signUp'}>
-              <button className="bg-white text-black w-[80px] h-[30px] rounded-full hover:font-extrabold">
-                Sign Up
-              </button>
-            </Link>
-          </>
-        ) : (
-          <>
-            <div className='flex justify-center items-center gap-1'>
-              <HiCurrencyDollar color='yellow' size={20}/>
-              <h1 className='font-bold text-white'>10.000</h1>
-            </div>
-            <div
-              className="relative flex items-center border-[1px] py-2 px-4 rounded-full"
-              ref={profileRef}
-              onClick={handleDropdownToggle}
-            >
-              <FiUser color='white' size={20}/>
-              <span className="text-white ml-2 cursor-pointer">
-                {userEmail}
-              </span>
-
-              {isDropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg w-48 text-black z-50"
-                >
-                  <ul className="py-2">
-                    {userType === 'Event Organizer' && (
-                      <>
-                        <li className="px-4 py-2 hover:underline cursor-pointer">
-                          <Link href="/my-event">My Event</Link>
-                        </li>
-                        <li className="px-4 py-2 hover:underline cursor-pointer">
-                          <Link href="/my-dashboard">My Dashboard</Link>
-                        </li>
-                      </>
-                    )}
-                    <li className="px-4 py-2 hover:underline cursor-pointer">
-                      <Link href="/account-settings">Account Settings</Link>
-                    </li>
-                    <hr className="my-1 border-gray-300" />
-                    <li
-                      className="px-4 py-2 hover:underline cursor-pointer"
-                      onClick={handleSignOut}
-                    >
-                      Sign Out
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
+        <div className="flex flex-col p-4">
+          <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Single Band</Link>
+          <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Group Band</Link>
+          <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Disc Jockey</Link>
+          <Link href={'/'} className="font-semibold text-white text-[15px]">Create Events</Link>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Navbar;
