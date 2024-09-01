@@ -52,9 +52,9 @@ export class UserController {
                 where: { email: email }
             })
 
-            if (!existingUser) throw "author not found !"
+            if (!existingUser) throw "user not found !"
 
-            //  if (!existingUser.isVerify) throw "author not verified !"
+            //  if (!existingUser.isVerify) throw "user not verified !"
 
             const isValidPass = await compare(password, existingUser.password)
             
@@ -68,7 +68,7 @@ export class UserController {
                 status: 'ok',
                 msg: "login success !",
                 token,
-                author: existingUser
+                user: existingUser
             })
         } catch (err) {
             res.status(400).send({

@@ -28,28 +28,25 @@ export default class App {
   }
 
   private handleError(): void {
-    // not found
+    // Not found for API routes
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
+        res.status(404).json({ status: 'error', msg: 'Not found!' });
       } else {
         next();
       }
-    });
+    });  
 
-    // error
-    this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
-      },
-    );
-  }
-
+    // Error handler
+  this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (req.path.includes('/api/')) {
+      console.error('Error: ', err.stack);
+      res.status(500).json({ status: 'error', msg: 'Internal server error' });
+    } else {
+      next();
+    }
+  });
+}
   private routes(): void {
     const userRouter = new UserRouter();
 

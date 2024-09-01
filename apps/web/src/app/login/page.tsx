@@ -1,17 +1,17 @@
-"use client";
-import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../AuthContext";
+'use client';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify'; // Import toast
+import { loginUser } from '@/lib/user'; // Import loginUser function
 
 const LoginID: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isValid, setIsValid] = useState(true);
-  const { setLoggedIn } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Basic validation
@@ -20,9 +20,24 @@ const LoginID: React.FC = () => {
       return;
     }
 
-    // Proceed with login and store email
-    setLoggedIn(true, email);
-    router.push("/event");
+    // Prepare data
+    const loginData = {
+      email,
+      password
+    };
+
+    try {
+      const { result, ok } = await loginUser(loginData);
+      if (ok) {
+        toast.success('Login successful!');
+        router.push('/event');
+      } else {
+        toast.error(result?.msg || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
