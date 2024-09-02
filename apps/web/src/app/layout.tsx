@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import {Poppins } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { AuthProvider } from './AuthContext';
+import { ToastContainer } from 'react-toastify';
 
-const poppins = Poppins({ subsets: ['latin'], weight: ["400", "500","600"]});
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'] });
 
 export const metadata: Metadata = {
   title: 'FullStack',
@@ -20,14 +20,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <AuthProvider>
-          <div className='pb-[60px]'>
-            <Navbar/>
-          </div>
-        
+        <div className="pb-[60px]">
+          <Navbar />
+        </div>
+
         {children}
-        <Footer/>
-        </AuthProvider>
+        <Footer />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          closeOnClick
+          draggable
+        />
       </body>
     </html>
   );
