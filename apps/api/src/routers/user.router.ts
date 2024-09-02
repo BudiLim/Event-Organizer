@@ -14,8 +14,10 @@ export class UserRouter {
   }
 
   private initializeRoutes(): void {
+    // protected routes
     this.router.get('/', verifyToken, this.userController.getUser);
     this.router.get('/:id', this.userController.getUserId);
+    // public routes
     this.router.post('/', this.userController.createUser);
     this.router.post('/login', this.userController.loginUser);
   }

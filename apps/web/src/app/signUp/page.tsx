@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import from next/navigation
+import { regUser } from '@/lib/user'; // Import the regUser function
+import { toast } from 'react-toastify';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,11 +14,9 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [isValid, setIsValid] = useState(true);
-  
-
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Basic validation
@@ -28,18 +28,45 @@ const Register: React.FC = () => {
       !lastName ||
       !phone ||
       !userType ||
-      (userType === 'User Music Experience' && !referralCode) || // Check referral code if userType is "Music Experience"
+      (userType === 'Experience' && !referralCode) ||
       password !== repeatPassword
     ) {
       setIsValid(false);
       return;
     }
 
-    // Show success alert
-    alert('Registration successful!');
+    // Prepare data
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      userType,
+      referralCode: userType === 'Experience' ? referralCode : undefined,
+    };
 
-    // Proceed with redirect
-    router.push('/login');
+    // Send data to backend
+    try {
+      console.log('Submitting registration data:', userData); // Debugging statement
+      const { result, ok } = await regUser(userData);
+      console.log('API response:', { result, ok }); // Debugging statement
+      if (ok) {
+        toast.success('Registration successful!');
+        router.push('/login');
+      } else {
+        // Check if the response is JSON
+        try {
+          const errorMsg = result?.msg || 'Registration failed';
+          toast.error(errorMsg);
+        } catch {
+          toast.error('Registration failed. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Unexpected response format:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
@@ -56,7 +83,6 @@ const Register: React.FC = () => {
               </h4>
             </div>
           </div>
-          {/* --start-- */}
           <div className="m-8">
             <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
               {/* Email Field */}
@@ -181,68 +207,59 @@ const Register: React.FC = () => {
                 </label>
               </div>
 
-              {/* User Type Dropdown */}
+              {/* User Type and Referral Code Fields */}
               <div className="relative z-0 w-full mb-5 group">
                 <select
-                  id="UserType"
-                  required
-                  className="block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-white peer"
+                  id="floating_user_type"
+                  name="floating_user_type"
+                  className="block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
                   value={userType}
                   onChange={(e) => setUserType(e.target.value)}
                 >
-                  <option className='text-white bg-[#101010] pb-1' disabled value="">
-                    What is your interest?
+                  <option value="" disabled>
+                    Select user type
                   </option>
-                  <option className='text-white bg-[#101010]' value="User Music Experience">
-                    Music Experience
-                  </option>
-                  <option className='text-white bg-[#101010]' value="Event Organizer">Event Organizer</option>
+                  <option value="Experience">Experience</option>
+                  <option value="Organizer">Organizer</option>
                 </select>
                 <label
-                  htmlFor="UserType"
-                  className="peer-focus:font-medium absolute text-sm text-white duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-whitepeer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  htmlFor="floating_user_type"
+                  className="peer-focus:font-medium absolute text-sm text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
                   User Type
                 </label>
               </div>
 
-              {/* Referral Code Field (Conditional) */}
-              {userType === 'User Music Experience' && (
+              {userType === 'Experience' && (
                 <div className="relative z-0 w-full mb-5 group">
                   <input
                     type="text"
-                    name="referral_code"
-                    id="referral_code"
+                    name="floating_referral_code"
+                    id="floating_referral_code"
                     className="block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-Dark-blue peer"
                     placeholder=" "
                     value={referralCode.toUpperCase()}
                     onChange={(e) =>
                       setReferralCode(e.target.value.toUpperCase())
                     }
-                    required
                   />
                   <label
-                    htmlFor="referral_code"
-                    className="peer-focus:font-medium absolute text-slate-400 text-sm duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    htmlFor="floating_referral_code"
+                    className="peer-focus:font-medium absolute text-sm text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >
-                    Referral Code
+                    Referral Code (Optional)
                   </label>
                 </div>
               )}
 
               {/* Submit Button */}
               <button
+                onClick={() => toast.success('Register Successful!')}
                 type="submit"
-                className="text-white bg-Dark-blue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="w-full px-6 py-2.5 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
               >
                 Register
               </button>
-
-              {!isValid && (
-                <p className="text-red-500 text-sm mt-2">
-                  Please fill in all fields correctly.
-                </p>
-              )}
             </form>
           </div>
         </div>
