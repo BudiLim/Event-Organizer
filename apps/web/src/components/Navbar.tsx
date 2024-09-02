@@ -43,7 +43,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        <Link href={'/'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
+        <Link href={'/create-event'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
 
         <LoginSignUp />
       </div>
@@ -58,7 +58,7 @@ const Navbar = () => {
           <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Single Band</Link>
           <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Group Band</Link>
           <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Disc Jockey</Link>
-          <Link href={'/'} className="font-semibold text-white text-[15px]">Create Events</Link>
+          <Link href={'/create-event'} className="font-semibold text-white text-[15px]">Create Events</Link>
         </div>
       </div>
     </div>

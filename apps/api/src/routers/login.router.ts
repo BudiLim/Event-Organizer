@@ -12,7 +12,7 @@ export class LoginRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/login', this.loginController.loginUser);
+    
   }
 
   getRouter(): Router {

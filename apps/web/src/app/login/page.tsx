@@ -22,7 +22,7 @@ const LoginID: React.FC = () => {
 
     // Proceed with login and store email
     setLoggedIn(true, email);
-    router.push("/landing_page");
+    router.push("/event");
   };
 
   return (
@@ -42,7 +42,7 @@ const LoginID: React.FC = () => {
               <div className="mb-5">
                 <label
                   htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-white dark:text-white"
+                  className="block mb-2 text-sm font-medium text-white"
                 >
                   Your email
                 </label>
@@ -62,7 +62,7 @@ const LoginID: React.FC = () => {
               <div className="mb-5">
                 <label
                   htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-white dark:text-white"
+                  className="block mb-2 text-sm font-medium text-white"
                 >
                   Your password
                 </label>
