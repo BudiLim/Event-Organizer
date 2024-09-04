@@ -138,7 +138,6 @@ export class UserController {
     }
   }
 
-  // New method to handle updating user information
   async updateUser(req: Request, res: Response) {
     try {
       const { firstName, lastName, phone, email, password } = req.body;
