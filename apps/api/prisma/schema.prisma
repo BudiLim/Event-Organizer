@@ -10,21 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           Int      @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  email        String   @unique
-  password     String
-  phone        String
-  company      String
-  address      String
-  isActive     Boolean  @default(false)
-  referralCOde String
-  code         String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+enum Role {
+  Experience
+  Organizer
+}
 
-  @@map("samples") // if you want to use snake_case format
+model User {
+  id             Int      @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String   @unique
+  password       String
+  phone          String
+  userType       Role
+  referralCode   String?
+  userUniqueCode String?  @unique
+  isActive       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 

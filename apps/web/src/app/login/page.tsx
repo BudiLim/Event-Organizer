@@ -1,17 +1,17 @@
-"use client";
-import Link from "next/link";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../AuthContext";
+'use client';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify'; // Import toast
+import { loginUser } from '@/lib/user'; // Import loginUser function
 
 const LoginID: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isValid, setIsValid] = useState(true);
-  const { setLoggedIn } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     // Basic validation
@@ -22,7 +22,7 @@ const LoginID: React.FC = () => {
 
     // Proceed with login and store email
     setLoggedIn(true, email);
-    router.push("/event");
+    router.push("/landing_page");
   };
 
   return (
@@ -49,7 +49,7 @@ const LoginID: React.FC = () => {
                 <input
                   type="email"
                   id="email"
-                  className="bg-gray-50 border border-gray-300 text-white text-sm rounded-lg focus:ring-Dark-blue focus:border-Dark-blue block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-Dark-blue focus:border-Dark-blue block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Email"
                   required
                   value={email}

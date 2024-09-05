@@ -9,7 +9,7 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { LoginRouter } from './routers/login.router'; // Import the LoginRouter
+import { UserRouter } from './routers/user.router';
 
 export default class App {
   private app: Express;
@@ -28,36 +28,33 @@ export default class App {
   }
 
   private handleError(): void {
-    // not found
+    // Not found for API routes
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
+        res.status(404).json({ status: 'error', msg: 'Not found!' });
       } else {
         next();
       }
-    });
+    });  
 
-    // error
-    this.app.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
-        } else {
-          next();
-        }
-      },
-    );
-  }
-
+    // Error handler
+  this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (req.path.includes('/api/')) {
+      console.error('Error: ', err.stack);
+      res.status(500).json({ status: 'error', msg: 'Internal server error' });
+    } else {
+      next();
+    }
+  });
+}
   private routes(): void {
-    const loginRouter = new LoginRouter(); // Initialize the LoginRouter
+    const userRouter = new UserRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/auth', loginRouter.getRouter()); // Use the login router with the `/auth` path
+    this.app.use('/api/user', userRouter.getRouter());
   }
 
   public start(): void {
