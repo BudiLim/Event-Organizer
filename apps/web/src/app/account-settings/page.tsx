@@ -67,16 +67,16 @@ const AccountInfo = () => {
       const token = await getToken();
       if (!token) throw new Error('No token found');
   
-      console.log('Token being sent for update:', token);
-  
-      // Build the update object dynamically
       const updateData: any = {};
   
       if (newFirstName) updateData.firstName = newFirstName;
       if (newLastName) updateData.lastName = newLastName;
       if (newPhone) updateData.phone = newPhone;
       if (newEmail) updateData.email = newEmail;
-      if (newPassword) updateData.password = newPassword;
+      if (newPassword) {
+        updateData.password = newPassword;
+        updateData.currentPassword = currentPassword; // Add current password for validation
+      }
   
       if (Object.keys(updateData).length === 0) {
         toast.error('No changes detected.');
@@ -94,9 +94,6 @@ const AccountInfo = () => {
   
       const data = await response.json();
   
-      console.log('Update Response Status:', response.status);
-      console.log('Update Response Data:', data);
-  
       if (response.ok) {
         if (newFirstName) toast.success('First name updated successfully!');
         if (newLastName) toast.success('Last name updated successfully!');
@@ -112,18 +109,18 @@ const AccountInfo = () => {
     }
   };
   
-
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (newPassword !== repeatPassword) {
       setPasswordError('Passwords do not match');
       return;
     }
-
+  
     handleUpdate();
     setPasswordError('');
   };
+  
 
   // form and style //
 

@@ -1,5 +1,6 @@
 import { UserController } from '@/controllers/user.controller';
 import { verifyToken } from '@/middlewares/token';
+import { validateRegister } from '@/middlewares/validator';
 import { Router } from 'express';
 
 export class UserRouter {
