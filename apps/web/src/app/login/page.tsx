@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify'; // Import toast
 import { loginUser } from '@/lib/user'; // Import loginUser function
+import { createToken } from '@/lib/server';
 
 const LoginID: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,9 +21,24 @@ const LoginID: React.FC = () => {
       return;
     }
 
-    // Proceed with login and store email
-    setLoggedIn(true, email);
-    router.push("/landing_page");
+    // Prepare data
+    const loginData = {
+      email,
+      password
+    };
+
+    try {
+      const { result, ok } = await loginUser(loginData);
+      if (ok) {
+        toast.success('Login successful!');
+        router.push('/event');
+      } else {
+        toast.error(result?.msg || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (

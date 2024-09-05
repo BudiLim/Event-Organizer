@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,10 +20,115 @@ model User {
   password       String
   phone          String
   userType       Role
-  referralCode   String?
-  userUniqueCode String?  @unique
+  referralCode   String? // Code entered by the user during registration (referrer's userUniqueCode)
+  points         Int      @default(0)
+  userUniqueCode String?  @unique // User's own unique code to be shared with others
   isActive       Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  // Relations
+  events         Event[]         @relation("OrganizedEvents")
+  tickets        Ticket[]        @relation("UserTickets")
+  transactions   Transaction[]
+  reviews        Review[]
+  pointsHistory  PointsHistory[]
+  referralsOwned Referral[]      @relation("Referrer")
+  referralsUsed  Referral[]      @relation("Referred")
+}
+
+model Event {
+  id             Int      @id @default(autoincrement())
+  organizerId    Int
+  name           String
+  price          Float    @default(0.0)
+  date           DateTime
+  time           DateTime
+  location       String
+  description    String
+  availableSeats Int
+  ticketType     String
+  isPaidEvent    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  organizer   User          @relation("OrganizedEvents", fields: [organizerId], references: [id])
+  tickets     Ticket[]      @relation("EventTickets")
+  promotions  Promotion[]
+  reviews     Review[]
+  Transaction Transaction[]
+}
+
+model Ticket {
+  id           Int      @id @default(autoincrement())
+  eventId      Int
+  userId       Int
+  purchaseDate DateTime @default(now())
+  price        Float
+  status       String   @default("Active")
+
+  // Relations
+  event Event @relation("EventTickets", fields: [eventId], references: [id])
+  user  User  @relation("UserTickets", fields: [userId], references: [id])
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  eventId    Int
+  userId     Int
+  rating     Int
+  reviewText String?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model Promotion {
+  id             Int      @id @default(autoincrement())
+  eventId        Int
+  discountAmount Float
+  validUntil     DateTime
+  createdAt      DateTime @default(now())
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id])
+}
+
+model PointsHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  points    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  eventId         Int
+  amount          Float
+  transactionDate DateTime @default(now())
+  status          String   @default("Success")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+}
+
+model Referral {
+  id         Int      @id @default(autoincrement())
+  referrerId Int
+  referredId Int
+  usedAt     DateTime @default(now())
+
+  // Relations
+  referrer User @relation("Referrer", fields: [referrerId], references: [id])
+  referred User @relation("Referred", fields: [referredId], references: [id])
 }
 

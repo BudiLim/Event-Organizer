@@ -48,9 +48,7 @@ const Register: React.FC = () => {
 
     // Send data to backend
     try {
-      console.log('Submitting registration data:', userData); // Debugging statement
       const { result, ok } = await regUser(userData);
-      console.log('API response:', { result, ok }); // Debugging statement
       if (ok) {
         toast.success('Registration successful!');
         router.push('/login');
@@ -64,7 +62,6 @@ const Register: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Unexpected response format:', error);
       toast.error('An unexpected error occurred. Please try again.');
     }
   };
@@ -254,7 +251,6 @@ const Register: React.FC = () => {
 
               {/* Submit Button */}
               <button
-                onClick={() => toast.success('Register Successful!')}
                 type="submit"
                 className="w-full px-6 py-2.5 text-white bg-blue-500 hover:bg-blue-600 rounded-lg"
               >
