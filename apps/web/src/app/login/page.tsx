@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify'; // Import toast
 import { loginUser } from '@/lib/user'; // Import loginUser function
+import { createToken } from '@/lib/server';
 
 const LoginID: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,7 @@ const LoginID: React.FC = () => {
       const { result, ok } = await loginUser(loginData);
       if (ok) {
         toast.success('Login successful!');
+        createToken(result.token)
         router.push('/event');
       } else {
         toast.error(result?.msg || 'Login failed');

@@ -1,38 +1,51 @@
-import { NextFunction, Request, Response } from "express";
-import { verify } from "jsonwebtoken";
+import { NextFunction, Request, Response } from 'express';
+import { verify } from 'jsonwebtoken';
 
 type IUser = {
-    id: number,
-    userType: string
-}
+  id: number;
+  userType: string;
+};
 
-export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const token = req.header("Authorization")?.replace("Bearer ", "")
-        if (!token) throw "token empty !"
+export const verifyToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    console.log('Token:', token); // Log the token
 
-        const verifiedToken = verify(token, process.env.SECRET_JWT!)
+    if (!token) throw new Error('Token is missing');
 
-        req.user = verifiedToken as IUser
+    const verifiedToken = verify(token, process.env.SECRET_JWT!);
+    console.log('Verified Token:', verifiedToken); // Log the verified token
 
-        next()
-    } catch (err) {
-        res.status(400).send({
-            status: 'error',
-            msg: err
-        })
-    }
-}
+    req.user = verifiedToken as IUser;
 
-export const checkAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        if (req.user?.userType !== "Admin") throw "Unauthorize !"
+    next();
+  } catch (err) {
+    console.error('Error:', err); // Log the error
+    res.status(400).send({
+      status: 'error',
+      msg: 'Invalid or expired token',
+    });
+  }
+};
 
-        next()
-    } catch (err) {
-        res.status(400).send({
-            status: 'error',
-            msg: err
-        })
-    }
-}
+export const checkAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (req.user?.userType !== "Admin") throw new Error("Unauthorized");
+    
+    next();
+  } catch (err) {
+    console.error('Error:', err); // Log the error
+    res.status(400).send({
+      status: 'error',
+      msg: 'Unauthorized',
+    });
+  }
+};

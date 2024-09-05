@@ -52,3 +52,16 @@ export const loginUser = async (data: IUserLogin) => {
         return { result: { status: "error", msg: "An error occurred" }, ok: false };
     }
 };
+
+export const verifyUser = async (token: string) => {
+    const res = await fetch(`${base_url}/user/verify`, {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    const result = await res.json()
+    return { result, ok: res.ok }
+}
+
+export default base_url
