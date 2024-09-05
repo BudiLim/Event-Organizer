@@ -14,6 +14,7 @@ const Register: React.FC = () => {
   const [userType, setUserType] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [isValid, setIsValid] = useState(true);
+  const [referralError, setReferralError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -28,7 +29,6 @@ const Register: React.FC = () => {
       !lastName ||
       !phone ||
       !userType ||
-      (userType === 'Experience' && !referralCode) ||
       password !== repeatPassword
     ) {
       setIsValid(false);
@@ -50,13 +50,22 @@ const Register: React.FC = () => {
     try {
       const { result, ok } = await regUser(userData);
       if (ok) {
-        toast.success('Registration successful!');
+        const referralOwner = result?.referralOwnerName
+          ? `Referral Code Owner: ${result.referralOwnerName.toUpperCase()}`
+          : '';
+
+        toast.success(<div>Registration successful!<br /><span className='font-bold'>{referralOwner}</span></div>);
         router.push('/login');
       } else {
         // Check if the response is JSON
         try {
           const errorMsg = result?.msg || 'Registration failed';
-          toast.error(errorMsg);
+          if (errorMsg.includes('Referral code is invalid')) {
+            setReferralError('Invalid referral code');
+            toast.error('Invalid referral code');
+          } else {
+            toast.error(errorMsg);
+          }
         } catch {
           toast.error('Registration failed. Please try again.');
         }
@@ -98,7 +107,7 @@ const Register: React.FC = () => {
                   htmlFor="floating_email"
                   className="peer-focus:font-medium absolute text-sm text-slate-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
-                  Email address
+                  Email
                 </label>
               </div>
 
