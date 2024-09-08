@@ -131,4 +131,3 @@ model Referral {
   referrer User @relation("Referrer", fields: [referrerId], references: [id])
   referred User @relation("Referred", fields: [referredId], references: [id])
 }
-

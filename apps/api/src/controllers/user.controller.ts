@@ -17,12 +17,17 @@ export class UserController {
         referralCode,
       } = req.body;
 
+      console.log(req.body)
+
       // Check if the email is already used
       const existingUser = await prisma.user.findUnique({
         where: { email: email },
       });
 
-      if (existingUser) throw 'Email has already been used!';
+      if (existingUser) {
+        console.log(existingUser)
+        throw 'Email has already been used!';
+      }  
 
       let referralOwnerName: string | null = null;
       let referrerId: number | null = null;
