@@ -6,6 +6,7 @@ export interface IUserReg {
     password: String
     userType: String
     referralCode?: String
+    points?: string
 }
 
 export interface IUserLogin {
@@ -16,4 +17,14 @@ export interface IUserLogin {
 export interface DecodedToken {
     id: string;
     userType: string;
+}
+
+export interface Referral {
+    id: number;
+    referrerId: number;
+    referredId: number;
+    pointsAwarded: number;
+    expiresAt: Date;
+    usedAt: Date;
+    expired: boolean;
 }
