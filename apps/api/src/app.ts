@@ -10,6 +10,7 @@ import express, {
 import cors from 'cors';
 import { PORT } from './config';
 import { UserRouter } from './routers/user.router';
+import { ReferralRouter } from './routers/referral.router';
 
 export default class App {
   private app: Express;
@@ -49,6 +50,8 @@ export default class App {
 }
   private routes(): void {
     const userRouter = new UserRouter();
+    const referralRouter = new ReferralRouter();
+    this.app.use('/api/referrals', referralRouter.getRouter());
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
