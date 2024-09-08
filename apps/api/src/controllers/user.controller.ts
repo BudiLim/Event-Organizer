@@ -47,6 +47,16 @@ export class UserController {
 
         referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
         referrerId = existingReferralCode.id;
+
+        // Add points to the referrer
+        await prisma.points.create({
+          data: {
+            userId: referrerId,
+            points: 10000, // Example points for referrer
+            expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Points expire in 3 months
+            expired: false,
+          },
+        });
       }
 
       // Hash the password
@@ -90,7 +100,10 @@ export class UserController {
       console.error(err);
       res.status(400).send({
         status: 'error',
-        msg: err instanceof Error ? err.message : 'An error occurred while creating user.',
+        msg:
+          err instanceof Error
+            ? err.message
+            : 'An error occurred while creating user.',
       });
     }
   }
