@@ -27,33 +27,6 @@ export class UserController {
       let referralOwnerName: string | null = null;
       let referrerId: number | null = null;
 
-      // Validate referral code if provided
-      if (referralCode) {
-        const existingReferralCode = await prisma.user.findUnique({
-          where: { userUniqueCode: referralCode },
-        });
-
-        if (!existingReferralCode) {
-          return res.status(400).send({
-            status: 'error',
-            msg: 'Referral code is invalid!',
-          });
-        }
-
-        referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
-        referrerId = existingReferralCode.id;
-
-        // Add points to the referrer
-        await prisma.points.create({
-          data: {
-            userId: referrerId,
-            points: 10000, // Example points for referrer
-            expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Points expire in 3 months
-            expired: false,
-          },
-        });
-      }
-
       // Hash the password
       const salt = await genSalt(10);
       const hashPassword = await hash(password, salt);
@@ -74,6 +47,56 @@ export class UserController {
           userUniqueCode,
         },
       });
+
+      // Validate referral code if provided
+      if (referralCode) {
+        const existingReferralCode = await prisma.user.findUnique({
+          where: { userUniqueCode: referralCode },
+        });
+
+        if (!existingReferralCode) {
+          return res.status(400).send({
+            status: 'error',
+            msg: 'Referral code is invalid!',
+          });
+        }
+
+        referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
+        referrerId = existingReferralCode.id;
+
+        // Add points to the referrer and update total points
+        const pointsToAward = 10000;
+
+        await prisma.user.update({
+          where: { id: referrerId },
+          data: {
+            points: {
+              increment: pointsToAward, // Increment referrer's total points
+            },
+          },
+        });
+
+        // Record point history
+        await prisma.points.create({
+          data: {
+            userId: referrerId,
+            points: pointsToAward,
+            expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Points expire in 3 months
+            expired: false,
+          },
+        });
+
+        // Create a discount voucher for the newly created user
+        await prisma.discount.create({
+          data: {
+            userId: user.id, // User ID of the newly created user
+            amount: 10, // 10% discount
+            validUntil: new Date(
+              new Date().setMonth(new Date().getMonth() + 3),
+            ), // Valid for 3 months
+          },
+        });
+      }
 
       // Record the referral usage if applicable
       if (referrerId) {

@@ -44,7 +44,7 @@ export default function MyEvent() {
                   1
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-event/event-details'}>Afgan Comeback</Link>
+                  <Link href={'/my-event/details'}>Afgan Comeback</Link>
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
                   Jakarta
@@ -60,7 +60,7 @@ export default function MyEvent() {
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium">
                   <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-event/event-details'}>edit</Link>
+                    <Link href={'/my-event/details'}>edit</Link>
                   </button>
                 </td>
               </tr>
@@ -70,7 +70,7 @@ export default function MyEvent() {
                   2
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-event/event-details'}>
+                  <Link href={'/my-event/details'}>
                     Ed Sheeran Live In Bandung
                   </Link>
                 </td>
@@ -88,7 +88,7 @@ export default function MyEvent() {
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium">
                   <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-event/event-details'}>edit</Link>
+                    <Link href={'/my-event/details'}>edit</Link>
                   </button>
                 </td>
               </tr>
@@ -98,7 +98,7 @@ export default function MyEvent() {
                   3
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-event/event-details'}>
+                  <Link href={'/my-event/details'}>
                     Rizky Febian Bandung Love Story
                   </Link>
                 </td>
@@ -116,7 +116,7 @@ export default function MyEvent() {
                 </td>
                 <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium">
                   <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-event/event-details'}>edit</Link>
+                    <Link href={'/my-event/details'}>edit</Link>
                   </button>
                 </td>
               </tr>
@@ -126,7 +126,7 @@ export default function MyEvent() {
 
         {/* Save Button */}
         <div className="flex justify-center mt-6 md:mt-10">
-          <Link href={'/landing_page'}>
+          <Link href={'/event'}>
             <button
               type="submit"
               className="text-white bg-Dark-blue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-4 md:px-5 py-2 md:py-2.5 text-center"
