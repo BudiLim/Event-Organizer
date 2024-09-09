@@ -22,7 +22,12 @@ export class UserController {
         where: { email: email },
       });
 
-      if (existingUser) throw 'Email has already been used!';
+      if (existingUser) {
+        return res.status(400).send({
+          status: 'error',
+          msg: 'Email has already been used!',
+        });
+      }
 
       let referralOwnerName: string | null = null;
       let referrerId: number | null = null;
@@ -33,20 +38,6 @@ export class UserController {
 
       // Generate a new unique code for the user
       const userUniqueCode = await generateReferralCode(firstName);
-
-      // Create the new user
-      const user = await prisma.user.create({
-        data: {
-          firstName,
-          lastName,
-          email,
-          password: hashPassword,
-          phone,
-          userType,
-          referralCode: referralCode || null, // Store referral code if provided
-          userUniqueCode,
-        },
-      });
 
       // Validate referral code if provided
       if (referralCode) {
@@ -63,6 +54,20 @@ export class UserController {
 
         referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
         referrerId = existingReferralCode.id;
+
+        // Create the new user
+        const user = await prisma.user.create({
+          data: {
+            firstName,
+            lastName,
+            email,
+            password: hashPassword,
+            phone,
+            userType,
+            referralCode: referralCode || null, // Store referral code if provided
+            userUniqueCode,
+          },
+        });
 
         // Add points to the referrer and update total points
         const pointsToAward = 10000;
@@ -96,24 +101,43 @@ export class UserController {
             ), // Valid for 3 months
           },
         });
-      }
 
-      // Record the referral usage if applicable
-      if (referrerId) {
+        // Record the referral usage
         await prisma.referral.create({
           data: {
             referrerId: referrerId,
             referredId: user.id,
           },
         });
-      }
 
-      res.status(201).send({
-        status: 'ok',
-        msg: 'User created successfully!',
-        user,
-        referralOwnerName,
-      });
+        res.status(201).send({
+          status: 'ok',
+          msg: 'User created successfully!',
+          user,
+          referralOwnerName,
+        });
+      } else {
+        // Create the user without referral code
+        const user = await prisma.user.create({
+          data: {
+            firstName,
+            lastName,
+            email,
+            password: hashPassword,
+            phone,
+            userType,
+            referralCode: referralCode || null, // Store referral code if provided
+            userUniqueCode,
+          },
+        });
+
+        res.status(201).send({
+          status: 'ok',
+          msg: 'User created successfully!',
+          user,
+          referralOwnerName,
+        });
+      }
     } catch (err) {
       console.error(err);
       res.status(400).send({

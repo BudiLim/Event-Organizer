@@ -1,4 +1,5 @@
-// controllers/points.controller.ts
+/// ini gk kepake, atau belum kepake ya, simpen aja dulu ///
+
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 
