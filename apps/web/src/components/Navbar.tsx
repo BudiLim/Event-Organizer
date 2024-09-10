@@ -5,20 +5,23 @@ import logo from "../assets/logo.png";
 import SearchInput from "@/app/search-bar/page";
 import Link from "next/link";
 import LoginSignUp from "@/app/login-signup/page";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { deleteToken, getToken } from "@/lib/server"
-import { useAppSelector } from "@/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import LogOut from "@/app/logout/page";
+import { logoutAction } from "@/redux/slice/authorSlice";
 
 const Navbar = () => {
   const [token, setToken] = useState('')
+  const dispatch = useAppDispatch()
   const getData = async () => {
       const res = await getToken()
       setToken(res || '')
   }
-  // const author = useAppSelector((state) => state.author)
+  const author = useAppSelector((state) => state.author)
   const onLogout = async () => {
       await deleteToken()
+      dispatch(logoutAction())
       setToken('')
   }
 
@@ -32,6 +35,13 @@ const Navbar = () => {
         <Link href={'/'}>
           <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
         </Link>
+      </div>
+
+      <div>
+        {author.firstName}
+        {author.lastName}
+        {author.email}
+        {author.role}
       </div>
 
       <div className="lg:hidden flex h-full items-center gap-[15px]">
@@ -57,7 +67,7 @@ const Navbar = () => {
         <Link href={'/create-event'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
 
       {
-        token ? 
+        author.id ? 
         <div onClick={onLogout}>
         <LogOut/>
         </div>

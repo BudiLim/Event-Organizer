@@ -21,13 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <div className="pb-[60px]">
+        <StoreProvider>
           <Navbar />
-        </div>
-        {/* <StoreProvider> */}
           {children}
-        {/* </StoreProvider> */}
-        <Footer />
+          <Footer />
+        </StoreProvider>
         <ToastContainer
           position="bottom-right"
           autoClose={3000}
