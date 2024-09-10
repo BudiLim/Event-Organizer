@@ -15,7 +15,7 @@ export class UserRouter {
 
   private initializeRoutes(): void {
     // protected routes
-    this.router.get('/', verifyToken, this.userController.getUser);
+    this.router.get('/',  verifyToken, this.userController.getUser);
     this.router.get('/:id', this.userController.getUserId);
     this.router.put('/update', verifyToken, this.userController.updateUser); // Added route for updating user
 
