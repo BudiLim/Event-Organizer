@@ -123,3 +123,14 @@ model Referral {
   referrer User @relation("Referrer", fields: [referrerId], references: [id])
   referred User @relation("Referred", fields: [referredId], references: [id])
 }
+
+model Points {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  points    Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  expired   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}

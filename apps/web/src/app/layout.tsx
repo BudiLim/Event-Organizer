@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ToastContainer } from 'react-toastify';
+import StoreProvider from '@/components/StoreProvider';
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'] });
 
@@ -23,8 +24,9 @@ export default function RootLayout({
         <div className="pb-[60px]">
           <Navbar />
         </div>
-
-        {children}
+        {/* <StoreProvider> */}
+          {children}
+        {/* </StoreProvider> */}
         <Footer />
         <ToastContainer
           position="bottom-right"

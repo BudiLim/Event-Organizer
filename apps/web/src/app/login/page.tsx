@@ -5,12 +5,16 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify'; // Import toast
 import { loginUser } from '@/lib/user'; // Import loginUser function
 import { createToken } from '@/lib/server';
+import { create } from 'cypress/types/lodash';
+import { useAppDispatch } from '@/redux/hooks';
+// import { loginAction } from '@/redux/slice/authorSlice';
 
 const LoginID: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isValid, setIsValid] = useState(true);
   const router = useRouter();
+  // const dispatch = useAppDispatch()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -29,8 +33,11 @@ const LoginID: React.FC = () => {
 
     try {
       const { result, ok } = await loginUser(loginData);
+      console.log(result, ok)
       if (ok) {
         toast.success('Login successful!');
+        // dispatch(loginAction(result.user))
+        createToken(result.token)
         router.push('/event');
       } else {
         toast.error(result?.msg || 'Login failed');
