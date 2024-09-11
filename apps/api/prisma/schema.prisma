@@ -28,12 +28,12 @@ model User {
   updatedAt      DateTime @updatedAt
 
   // Relations
-  events         Event[]         @relation("OrganizedEvents")
-  tickets        Ticket[]        @relation("UserTickets")
+  events         Event[]       @relation("OrganizedEvents")
+  tickets        Ticket[]      @relation("UserTickets")
   transactions   Transaction[]
   reviews        Review[]
-  referralsOwned Referral[]      @relation("Referrer")
-  referralsUsed  Referral[]      @relation("Referred")
+  referralsOwned Referral[]    @relation("Referrer")
+  referralsUsed  Referral[]    @relation("Referred")
   Points         Points[]
 }
 
@@ -41,13 +41,13 @@ model Event {
   id             Int      @id @default(autoincrement())
   organizerId    Int
   name           String
-  price          Float    @default(0.0)
+  price          Float @default(0.0)
   date           DateTime
   time           DateTime
   location       String
   description    String
+  image          String
   availableSeats Int
-  ticketType     String
   isPaidEvent    Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
