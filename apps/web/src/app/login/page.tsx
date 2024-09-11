@@ -59,7 +59,7 @@ const LoginID: React.FC = () => {
               </h4>
             </div>
           </div>
-          {/* --start-- */}
+
           <div className="m-6">
             <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
               <div className="mb-5">
@@ -125,7 +125,7 @@ const LoginID: React.FC = () => {
               </button>
             </form>
           </div>
-          {/* --end-- */}
+          
           <div className="mx-auto flex justify-center ">
             <h5 className="font-normal bg-gradient-to-br mt-6 text-gray-300 text-sm lg:text-sm">
               Don&apos;t have an account ?{" "}
