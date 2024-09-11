@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Event` MODIFY `price` DECIMAL(10, 2) NOT NULL DEFAULT 0.0;

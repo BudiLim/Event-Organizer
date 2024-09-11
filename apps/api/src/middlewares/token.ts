@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 type IUser = {
   id: number;
@@ -32,13 +33,13 @@ export const verifyToken = async (
   }
 };
 
-export const checkAdmin = async (
+export const checkRole = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    if (req.user?.userType !== "Admin") throw new Error("Unauthorized");
+    if (req.user?.userType !== "Experience") throw new Error("Unauthorized");
     
     next();
   } catch (err) {

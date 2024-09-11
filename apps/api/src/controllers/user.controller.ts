@@ -2,6 +2,10 @@ import prisma from '@/prisma';
 import { Request, Response } from 'express';
 import { compare, genSalt, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
+import { transporter } from "../helpers/notmailer";
+import path from 'path';
+import fs from 'fs';
+import handlebars from 'handlebars';
 import generateReferralCode from '@/middlewares/uniquecode';
 
 export class UserController {
@@ -16,47 +20,49 @@ export class UserController {
         userType,
         referralCode,
       } = req.body;
-
+  
       // Check if the email is already used
       const existingUser = await prisma.user.findUnique({
         where: { email: email },
       });
-
+  
       if (existingUser) {
         return res.status(400).send({
           status: 'error',
           msg: 'Email has already been used!',
         });
       }
-
+  
       let referralOwnerName: string | null = null;
       let referrerId: number | null = null;
-
+  
       // Hash the password
       const salt = await genSalt(10);
       const hashPassword = await hash(password, salt);
-
+  
       // Generate a new unique code for the user
       const userUniqueCode = await generateReferralCode(firstName);
-
-      // Validate referral code if provided
+  
+      let user; // Declare user here so it is accessible in all blocks
+  
       if (referralCode) {
+        // Validate referral code if provided
         const existingReferralCode = await prisma.user.findUnique({
           where: { userUniqueCode: referralCode },
         });
-
+  
         if (!existingReferralCode) {
           return res.status(400).send({
             status: 'error',
             msg: 'Referral code is invalid!',
           });
         }
-
+  
         referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
         referrerId = existingReferralCode.id;
-
-        // Create the new user
-        const user = await prisma.user.create({
+  
+        // Create the new user with referral code
+        user = await prisma.user.create({
           data: {
             firstName,
             lastName,
@@ -68,10 +74,10 @@ export class UserController {
             userUniqueCode,
           },
         });
-
+  
         // Add points to the referrer and update total points
         const pointsToAward = 10000;
-
+  
         await prisma.user.update({
           where: { id: referrerId },
           data: {
@@ -80,7 +86,7 @@ export class UserController {
             },
           },
         });
-
+  
         // Record point history
         await prisma.points.create({
           data: {
@@ -90,18 +96,7 @@ export class UserController {
             expired: false,
           },
         });
-
-        // Create a discount voucher for the newly created user
-        await prisma.discount.create({
-          data: {
-            userId: user.id, // User ID of the newly created user
-            amount: 10, // 10% discount
-            validUntil: new Date(
-              new Date().setMonth(new Date().getMonth() + 3),
-            ), // Valid for 3 months
-          },
-        });
-
+  
         // Record the referral usage
         await prisma.referral.create({
           data: {
@@ -109,16 +104,9 @@ export class UserController {
             referredId: user.id,
           },
         });
-
-        res.status(201).send({
-          status: 'ok',
-          msg: 'User created successfully!',
-          user,
-          referralOwnerName,
-        });
       } else {
         // Create the user without referral code
-        const user = await prisma.user.create({
+        user = await prisma.user.create({
           data: {
             firstName,
             lastName,
@@ -130,14 +118,51 @@ export class UserController {
             userUniqueCode,
           },
         });
-
-        res.status(201).send({
-          status: 'ok',
-          msg: 'User created successfully!',
-          user,
-          referralOwnerName,
-        });
       }
+  
+      // Send verification email
+      const payload = { id: user.id };
+      const token = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '10m',
+      });
+  
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'verification.hbs',
+      );
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+      const compiledTemplate = handlebars.compile(templateSource);
+      const html = compiledTemplate({
+        name: user.firstName,
+        link: `http://localhost:3000/verify/${token}`,
+      });
+  
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: 'Welcome to CaloTiket',
+        html: html,
+      });
+  
+      // Create a discount voucher for the newly created user
+      await prisma.discount.create({
+        data: {
+          userId: user.id, // User ID of the newly created user
+          discountVoucher: 10, // 10% discount
+          validUntil: new Date(
+            new Date().setMonth(new Date().getMonth() + 3),
+          ), // Valid for 3 months
+        },
+      });
+  
+      // Send the response
+      res.status(201).send({
+        status: 'ok',
+        msg: 'Account created successfully!',
+        user,
+        referralOwnerName,
+      });
     } catch (err) {
       console.error(err);
       res.status(400).send({
@@ -149,6 +174,7 @@ export class UserController {
       });
     }
   }
+  
 
   async loginUser(req: Request, res: Response) {
     try {
@@ -158,7 +184,8 @@ export class UserController {
         where: { email: email },
       });
 
-      if (!existingUser) throw 'user not found!';
+      if (!existingUser) throw 'Account not found!';
+      if (!existingUser.isActive) throw 'Account not verify !';
 
       const isValidPass = await compare(password, existingUser.password);
 
@@ -195,7 +222,7 @@ export class UserController {
 
       res.status(200).send({
         status: 'ok',
-        msg: 'success verify author !',
+        msg: 'success verify account !',
       });
     } catch (err) {
       res.status(400).send({
@@ -210,7 +237,7 @@ export class UserController {
       const user = await prisma.user.findMany();
       res.status(200).send({
         status: 'ok',
-        msg: 'user fetched!',
+        msg: 'Account fetched!',
         user,
       });
     } catch (err) {
@@ -227,10 +254,10 @@ export class UserController {
       const user = await prisma.user.findUnique({
         where: { id: +req.params.id },
       });
-      if (!user) throw 'user not found!';
+      if (!user) throw 'Account not found!';
       res.status(200).send({
         status: 'ok',
-        msg: 'user fetched!',
+        msg: 'Account fetched!',
         user,
       });
     } catch (err) {
@@ -248,11 +275,11 @@ export class UserController {
         req.body;
       const userId = req.user?.id;
 
-      if (!userId) throw new Error('User not authenticated');
+      if (!userId) throw new Error('Account not authenticated');
 
       // Retrieve the current user data
       const user = await prisma.user.findUnique({ where: { id: userId } });
-      if (!user) throw new Error('User not found');
+      if (!user) throw new Error('Account not found');
 
       // Check if the user wants to update the password
       let hashedPassword;
@@ -291,7 +318,7 @@ export class UserController {
 
       res.status(200).send({
         status: 'ok',
-        msg: 'User information updated successfully!',
+        msg: 'Account information updated successfully!',
         user: updatedUser,
       });
     } catch (err) {
