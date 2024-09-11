@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import afgan from '@/assets/afgan.png';
 
-export default function EventDetails() {
+export default function CretaeEvent() {
   return (
     <section className="relative w-full flex justify-center items-center py-10 px-5">
       <div className="w-full max-w-3xl bg-white shadow-xl rounded-lg p-8">

@@ -1,67 +1,41 @@
+
 'use client'
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import logo from "../assets/logo.png";
 import SearchInput from "@/app/search-bar/page";
 import Link from "next/link";
 import LoginSignUp from "@/app/login-signup/page";
 import { FiMenu, FiX } from "react-icons/fi";
-import { deleteToken, getToken } from "@/lib/server"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import LogOut from "@/app/logout/page";
-import { logoutAction } from "@/redux/slice/authorSlice";
-import { useRouter } from 'next/navigation';
-
 
 const Navbar = () => {
-  const [token, setToken] = useState('')
-  const dispatch = useAppDispatch()
-  const router = useRouter();
-  const getData = async () => {
-    const res = await getToken()
-    setToken(res || '')
-  }
-  const author = useAppSelector((state) => state.author)
-  const onLogout = async () => {
-    await deleteToken()
-    dispatch(logoutAction())
-    router.push('/')
-    setToken(''
-
-    )
-  }
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  useEffect(() => {
-    getData()
-  }, [])
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  }
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+  }
 
   return (
     <div className="fixed flex justify-between top-0 z-10 h-[60px] w-full px-[20px] lg:px-[40px] bg-black bg-opacity-70">
-
-      {
-        author.id ?
-          <div className="flex items-center h-full">
-            <Link href={'/event'}>
-              <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
-            </Link>
-          </div>
-          :
-          <div className="flex items-center h-full">
-            <Link href={'/'}>
-              <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
-            </Link>
-          </div>
-      }
+      <div className="flex items-center h-full">
+        <Link href={'/'}>
+          <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
+        </Link>
+      </div>
 
       <div className="lg:hidden flex h-full items-center gap-[15px]">
         <SearchInput />
-        <FiMenu size={30} color="white" onClick={toggleSidebar}/>
+        <FiMenu size={30} color="white" onClick={toggleSidebar} />
       </div>
 
       <div className="hidden lg:flex h-full items-center gap-[30px]">
@@ -81,19 +55,32 @@ const Navbar = () => {
 
         <Link href={'/create-event'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
 
-        {
-          author.id ?
-            <div onClick={onLogout}>
-              <LogOut />
-            </div>
-            :
-            <LoginSignUp />
-        }
+        {!isLoggedIn ? (
+        <div className="flex h-full items-center gap-[20px] font-semibold text-black">
+          <Link href={'/login'}>
+            <button className="w-[80px] h-[30px] bg-white text-[15px] rounded-full">
+              Log In
+            </button>
+          </Link>
+          <Link href={'/signUp'}>
+            <button className="w-[80px] h-[30px] bg-white text-[15px] rounded-full">
+              Sign Up
+            </button>
+          </Link>
+        </div>
+      ) : (
+        <button className="font-semibold text-white text-[15px] hover:scale-105" onClick={handleLogout}>
+          Logout
+        </button>
+      )}
+
       </div>
+
+      {/* Sidebar */}
       <div className={`fixed top-0 left-0 h-full w-[250px] bg-[#101010] transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-20`}>
         <div className="flex justify-between items-center p-4">
           <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
-          <FiX size={30} color="white" onClick={toggleSidebar}/>
+          <FiX size={30} color="white" onClick={toggleSidebar} />
         </div>
         <div className="flex flex-col p-4">
           <Link href={'/'} className="font-semibold text-white text-[15px] mb-4">Single Band</Link>
@@ -106,4 +93,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

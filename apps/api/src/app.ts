@@ -37,23 +37,22 @@ export default class App {
       } else {
         next();
       }
-    });  
+    });
 
     // Error handler
-  this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    if (req.path.includes('/api/')) {
-      console.error('Error: ', err.stack);
-      res.status(500).json({ status: 'error', msg: 'Internal server error' });
-    } else {
-      next();
-    }
-  });
-}
+    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      if (req.path.includes('/api/')) {
+        console.error('Error: ', err.stack);
+        res.status(500).json({ status: 'error', msg: 'Internal server error' });
+      } else {
+        next();
+      }
+    });
+  }
   private routes(): void {
     const userRouter = new UserRouter();
     const referralRouter = new ReferralRouter();
     const eventRouter = new EventRouter();
-
     this.app.use('/api/referrals', referralRouter.getRouter());
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -61,7 +60,7 @@ export default class App {
     });
 
     this.app.use('/api/user', userRouter.getRouter());
-    this.app.use('/api/event', eventRouter.getRouter())
+    this.app.use('/api/create-event', eventRouter.getRouter());
   }
 
   public start(): void {

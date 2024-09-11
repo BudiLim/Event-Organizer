@@ -42,17 +42,13 @@ model Event {
   id             Int      @id @default(autoincrement())
   organizerId    Int
   name           String
-  slug           String
-  image          String
-  price          Decimal    @default(0.0) @db.Decimal(10, 2)
-  eventDate      DateTime
-  eventTime      DateTime
-  sellEndDate    DateTime
-  sellEndTime    DateTime
+  price          Float @default(0.0)
+  date           DateTime
+  time           DateTime
   location       String
   description    String
+  image          String
   availableSeats Int
-  ticketType     String
   isPaidEvent    Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
