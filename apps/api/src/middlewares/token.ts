@@ -39,8 +39,8 @@ export const checkRole = async (
   next: NextFunction,
 ) => {
   try {
-    if (req.user?.userType !== "Experience") throw new Error("Unauthorized");
-    
+    if (req.user?.userType !== 'Organizer') throw new Error('Unauthorized');
+
     next();
   } catch (err) {
     console.error('Error:', err); // Log the error

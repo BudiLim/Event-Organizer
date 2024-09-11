@@ -1,4 +1,5 @@
 import { DashboardController } from '@/controllers/dashboard.controller';
+import { checkRole, verifyToken } from '@/middlewares/token';
 import { Router } from 'express';
 
 export class DashboardRouter {
@@ -15,7 +16,9 @@ export class DashboardRouter {
     // Update the route to include :organizerId
     this.router.get(
       '/:organizerId',
-      this.dashboardController.getOrganizerDashboardData.bind(this.dashboardController),
+      verifyToken,
+      checkRole,
+      this.dashboardController.getOrganizerDashboardData,
     );
   }
 

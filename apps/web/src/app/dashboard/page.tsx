@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -21,20 +21,26 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ organizerId }) => {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);  // State for fetched data
-  const [loading, setLoading] = useState(true);                                   // Loading state
-  const [error, setError] = useState<string | null>(null);                        // Error state
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  ); // State for fetched data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
 
   // Fetch data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/dashboard/${organizerId}`);
-        setDashboardData(response.data);  // Set the fetched data
+        const response = await axios.get(
+          `http://localhost:8000/api/dashboard/${organizerId}`,
+          { withCredentials: true }, // Include cookies with the request
+        );
+        setDashboardData(response.data);
       } catch (err) {
+        console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data');
       } finally {
-        setLoading(false);  // Stop loading
+        setLoading(false);
       }
     };
 

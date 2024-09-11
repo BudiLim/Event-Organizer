@@ -9,36 +9,32 @@ export class DashboardController {
     const organizerId = parseInt(organizerIdParam, 10);
 
     if (isNaN(organizerId)) {
+      console.error('Invalid organizer ID:', organizerIdParam);
       return res.status(400).json({ error: 'Invalid organizer ID' });
     }
 
     try {
-      // Fetch organizer details
       const organizer = await prisma.user.findUnique({
         where: { id: organizerId },
         select: { firstName: true, lastName: true },
       });
 
-      // Check if organizer exists
       if (!organizer) {
         return res.status(404).json({ error: 'Organizer not found' });
       }
 
       const fullName = `${organizer.firstName} ${organizer.lastName}`;
 
-      // Fetch all events organized by the user
       const events = await prisma.event.findMany({
         where: { organizerId },
         select: { id: true, name: true, location: true, availableSeats: true },
       });
 
-      // Fetch transactions (orders) for all events organized by this user
       const transactions = await prisma.transaction.findMany({
         where: { event: { organizerId } },
         select: { amount: true },
       });
 
-      // Calculate total revenue, tickets sold, and total orders
       const totalRevenue = transactions.reduce(
         (sum: number, transaction: { amount: number }) =>
           sum + transaction.amount,
@@ -46,7 +42,6 @@ export class DashboardController {
       );
       const totalOrders = transactions.length;
 
-      // Send the response with the calculated data
       res.json({
         fullName,
         totalRevenue,
