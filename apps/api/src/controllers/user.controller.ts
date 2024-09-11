@@ -214,10 +214,10 @@ export class UserController {
 
   async verifyUser(req: Request, res: Response) {
     try {
-      const author = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: req.user?.id },
       });
-      if (author?.isActive) throw 'invalid link';
+      if (user?.isActive) throw 'invalid link';
 
       await prisma.user.update({
         data: { isActive: true },

@@ -98,7 +98,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full pb-20">
       <div className="relative mx-auto lg:w-[90%] h-[450px] lg:h-screen shadow-lg shadow-slate-500 overflow-hidden rounded-lg">
         <div
           className={`relative w-full h-full transition-all duration-500 ${transitioning ? 'opacity-0' : 'opacity-100'}`}

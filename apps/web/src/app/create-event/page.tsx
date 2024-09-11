@@ -47,18 +47,18 @@ export default function CretaeEvent() {
               <div className="flex-1">
                 <h2 className="text-lg font-semibold"> Event Date</h2>
                 <input
-                type="date"
-                placeholder="10 Sep 2024"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
+                  type="date"
+                  placeholder="10 Sep 2024"
+                  className="input input-bordered input-sm w-full max-w-xs"
+                />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">Time</h2>
                 <input
-                type="time"
-                placeholder="19:00 WIB"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
+                  type="time"
+                  placeholder="19:00 WIB"
+                  className="input input-bordered input-sm w-full max-w-xs"
+                />
               </div>
             </div>
 
@@ -66,18 +66,18 @@ export default function CretaeEvent() {
               <div className="flex-1">
                 <h2 className="text-lg font-semibold"> Selling End at</h2>
                 <input
-                type="date"
-                placeholder="10 Sep 2024"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
+                  type="date"
+                  placeholder="10 Sep 2024"
+                  className="input input-bordered input-sm w-full max-w-xs"
+                />
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">Time</h2>
                 <input
-                type="time"
-                placeholder="19:00 WIB"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
+                  type="time"
+                  placeholder="19:00 WIB"
+                  className="input input-bordered input-sm w-full max-w-xs"
+                />
               </div>
             </div>
 
