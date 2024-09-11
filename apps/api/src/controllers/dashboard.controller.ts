@@ -1,10 +1,16 @@
 import prisma from '@/prisma';
-import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 
 export class DashboardController {
   async getOrganizerDashboardData(req: Request, res: Response) {
-    const organizerId = parseInt(req.params.organizerId, 10);
+    const organizerIdParam = req.params.organizerId;
+    console.log('Organizer ID Param:', organizerIdParam);
+
+    const organizerId = parseInt(organizerIdParam, 10);
+
+    if (isNaN(organizerId)) {
+      return res.status(400).json({ error: 'Invalid organizer ID' });
+    }
 
     try {
       // Fetch organizer details
@@ -49,7 +55,7 @@ export class DashboardController {
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      res.status(500).json({ error: 'Unable to fetch dashboard data' });
+      res.status(500).json({ error: 'Unable to fetch dashboard data', details: error as string });
     }
   }
 }
