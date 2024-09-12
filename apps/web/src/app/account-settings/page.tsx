@@ -54,7 +54,6 @@ const AccountInfo = () => {
           toast.error(data.msg || 'Failed to fetch user data.');
         }
       } catch (error) {
-        console.error('Fetch Error:', error); // Log detailed fetch errors
         toast.error('An error occurred while fetching user data.');
       }
     };
@@ -66,23 +65,23 @@ const AccountInfo = () => {
     try {
       const token = await getToken();
       if (!token) throw new Error('No token found');
-  
+
       const updateData: any = {};
-  
+
       if (newFirstName) updateData.firstName = newFirstName;
       if (newLastName) updateData.lastName = newLastName;
       if (newPhone) updateData.phone = newPhone;
       if (newEmail) updateData.email = newEmail;
       if (newPassword) {
         updateData.password = newPassword;
-        updateData.currentPassword = currentPassword; // Add current password for validation
+        updateData.currentPassword = currentPassword;
       }
-  
+
       if (Object.keys(updateData).length === 0) {
         toast.error('No changes detected.');
         return;
       }
-  
+
       const response = await fetch(`${base_url}/user/update`, {
         method: 'PUT',
         headers: {
@@ -91,9 +90,9 @@ const AccountInfo = () => {
         },
         body: JSON.stringify(updateData),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         if (newFirstName) toast.success('First name updated successfully!');
         if (newLastName) toast.success('Last name updated successfully!');
@@ -103,24 +102,30 @@ const AccountInfo = () => {
       } else {
         toast.error(data.msg || 'Update failed.');
       }
+      setNewFirstName('');
+      setNewLastName('');
+      setNewPhone('');
+      setNewEmail('');
+      setCurrentPassword('');
+      setNewPassword('');
+      setRepeatPassword('');
     } catch (error) {
       console.error('Error updating user data:', error);
       toast.error('An error occurred.');
     }
   };
-  
+
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (newPassword !== repeatPassword) {
       setPasswordError('Passwords do not match');
       return;
     }
-  
+
     handleUpdate();
     setPasswordError('');
   };
-  
 
   // form and style //
 

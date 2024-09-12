@@ -1,5 +1,6 @@
 'use client'
 
+import LoginID from "@/app/login/page";
 import { verifyUser } from "@/lib/user";
 import { useParams } from "next/navigation"
 import { useEffect } from "react";
@@ -22,8 +23,8 @@ export default function VerifyPage() {
     }, [])
     
     return (
-        <div className="flex h-full w-full justify-center items-center">
-            <h1>Verification Page</h1>
+        <div>
+            <LoginID></LoginID>
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { UserController } from '@/controllers/user.controller';
-import { verifyToken } from '@/middlewares/token';
+import { checkRole, verifyToken } from '@/middlewares/token';
 import { validateRegister } from '@/middlewares/validator';
 import { Router } from 'express';
 
@@ -15,7 +15,7 @@ export class UserRouter {
 
   private initializeRoutes(): void {
     // protected routes
-    this.router.get('/', this.userController.getUser);
+    this.router.get('/', verifyToken, checkRole, this.userController.getUser);
     this.router.get('/:id', this.userController.getUserId);
     this.router.put('/update', verifyToken, this.userController.updateUser); // Added route for updating user
 

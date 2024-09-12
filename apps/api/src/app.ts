@@ -8,10 +8,12 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { PORT } from './config';
 import { UserRouter } from './routers/user.router';
 import { ReferralRouter } from './routers/referral.router';
 import { EventRouter } from './routers/event.router';
+import { DashboardRouter } from './routers/dashboard.router';
 
 export default class App {
   private app: Express;
@@ -24,7 +26,13 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+      }),
+    );
+    this.app.use(cookieParser());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
   }
@@ -40,19 +48,24 @@ export default class App {
     });
 
     // Error handler
-    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      if (req.path.includes('/api/')) {
-        console.error('Error: ', err.stack);
-        res.status(500).json({ status: 'error', msg: 'Internal server error' });
-      } else {
-        next();
-      }
-    });
+    this.app.use(
+      (err: Error, req: Request, res: Response, next: NextFunction) => {
+        if (req.path.includes('/api/')) {
+          console.error('Error: ', err.stack);
+          res
+            .status(500)
+            .json({ status: 'error', msg: 'Internal server error' });
+        } else {
+          next();
+        }
+      },
+    );
   }
   private routes(): void {
     const userRouter = new UserRouter();
     const referralRouter = new ReferralRouter();
     const eventRouter = new EventRouter();
+    const dashboardRouter = new DashboardRouter();
     this.app.use('/api/referrals', referralRouter.getRouter());
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -61,10 +74,7 @@ export default class App {
 
     this.app.use('/api/user', userRouter.getRouter());
     this.app.use('/api/create-event', eventRouter.getRouter());
-
-    this.app.get('/api/test', (req: Request, res: Response) => {
-      res.send("Route is working!");
-    });
+    this.app.use('/api/dashboard', dashboardRouter.getRouter());
   }
 
   public start(): void {
