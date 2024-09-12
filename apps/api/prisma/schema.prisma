@@ -35,6 +35,7 @@ model User {
   referralsOwned Referral[]    @relation("Referrer")
   referralsUsed  Referral[]    @relation("Referred")
   Points         Points[]
+  Discount       Discount[]
 }
 
 model Event {
@@ -89,12 +90,26 @@ model Review {
 model Promotion {
   id             Int      @id @default(autoincrement())
   eventId        Int
-  discountAmount Float
+  discountCode   String
+  amount         Float
+  quotaAvailable String
+  quotaUsed      String
   validUntil     DateTime
   createdAt      DateTime @default(now())
 
   // Relations
   event Event @relation(fields: [eventId], references: [id])
+}
+
+model Discount {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  discountVoucher Float    @default(0)
+  validUntil      DateTime
+  createdAt       DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Transaction {

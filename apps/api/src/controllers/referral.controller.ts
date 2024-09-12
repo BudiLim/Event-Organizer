@@ -1,4 +1,5 @@
-// controllers/referral.controller.ts
+/// ini gk kepake, atau belum kepake ya, simpen aja dulu ///
+
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 import dayjs from 'dayjs'; // For handling dates
@@ -68,7 +69,9 @@ export class ReferralController {
 
       res.json({ message: 'Referral marked as expired' });
     } catch (err) {
-      res.status(500).json({ message: 'Failed to mark referral as expired', error: err });
+      res
+        .status(500)
+        .json({ message: 'Failed to mark referral as expired', error: err });
     }
   }
 

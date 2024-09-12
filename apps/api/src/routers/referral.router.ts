@@ -1,4 +1,3 @@
-// routers/referral.router.ts
 import { Router } from 'express';
 import { ReferralController } from '@/controllers/referral.controller';
 import { verifyToken } from '@/middlewares/token';
