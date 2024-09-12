@@ -14,6 +14,7 @@ export class DashboardRouter {
 
   private initializeRoutes(): void {
     // Update the route to include :organizerId
+    this.router.get('/', verifyToken, this.dashboardController.getOrganizerDashboardData);
     this.router.get(
       '/:organizerId',
       verifyToken,
