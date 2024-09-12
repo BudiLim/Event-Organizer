@@ -1,4 +1,3 @@
-// routers/points.router.ts
 import { Router } from 'express';
 import { verifyToken } from '@/middlewares/token';
 import { PointsController } from '@/controllers/point.controller';

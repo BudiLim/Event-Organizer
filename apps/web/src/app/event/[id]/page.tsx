@@ -25,7 +25,7 @@ const DetailEvent = () => {
     };
 
     return (
-        <div className='flex justify-center items-center h-screen'>
+        <div className='flex justify-center items-center m-8'>
             <div className='flex bg-black p-8 rounded-lg gap-[80px]'>
                 <div className='shadow-sm shadow-white rounded-lg'>
                     <Image src={afgan} alt='image' width={450} />
@@ -55,7 +55,7 @@ const DetailEvent = () => {
                                         type=""
                                         value={ticketCount}
                                         onChange={handleInputChange}
-                                        className="w-10 text-center border border-gray-300 rounded"
+                                        className="w-10 text-center text-black border border-gray-300 rounded"
 
                                     />
                                     <FiPlusCircle onClick={plusCount} size={26} />
@@ -64,7 +64,7 @@ const DetailEvent = () => {
                         </div>
                         <div className='flex flex-col gap-2'>
                             <h1>Discount Voucher</h1>
-                            <input type="text" placeholder='Refferal Code Here . . .' className='input input-bordered' />
+                            <input type="text" placeholder='Refferal Code Here . . .' className='input input-bordered text-black' />
                         </div>
                     </div>
 
