@@ -1,91 +1,79 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-// Define the type for dashboard data
-interface DashboardData {
-  fullName: string;
-  totalRevenue: number;
-  totalOrders: number;
-  events: Array<{
-    id: number;
-    name: string;
-    location: string;
-    availableSeats: number;
-  }>;
-}
-
-// Define the type for component props
-interface DashboardProps {
-  organizerId: string;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ organizerId }) => {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null,
-  ); // State for fetched data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
-
-  // Fetch data when the component mounts
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/dashboard/${organizerId}`,
-          { withCredentials: true }, // Include cookies with the request
-        );
-        setDashboardData(response.data);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [organizerId]);
-
-  // Handle loading state
-  if (loading) return <p>Loading...</p>;
-
-  // Handle error state
-  if (error) return <p>{error}</p>;
-
-  // Render the dashboard data if available
+const Dashboard = () => {
   return (
-    <div className="dashboard">
-      {dashboardData ? (
-        <>
-          <h1>{dashboardData.fullName}'s Dashboard</h1>
-          <div>Total Revenue: {dashboardData.totalRevenue}</div>
-          <div>Total Orders: {dashboardData.totalOrders}</div>
-          {/* Display events */}
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Event Name</th>
-                <th>Location</th>
-                <th>Available Seats</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dashboardData.events.map((event, index) => (
-                <tr key={event.id}>
-                  <td>{index + 1}</td>
-                  <td>{event.name}</td>
-                  <td>{event.location}</td>
-                  <td>{event.availableSeats}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      ) : (
-        <p>No data available</p>
-      )}
+    <div className="p-6 bg-gray-100 min-h-screen">
+      {/* Header */}
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Company Name</h1>
+        <p className="text-lg">My Dashboard</p>
+      </header>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="bg-gray-300 p-4 rounded-lg">
+          <p className="text-sm font-bold">Total Revenue</p>
+          <p className="text-sm text-gray-500">Jun - Sep 2024</p>
+          <p className="text-2xl font-semibold">Rp. 46.450.000,-</p>
+          <p className="text-green-500 text-sm">▲ 38.87% from last week</p>
+        </div>
+        <div className="bg-gray-300 p-4 rounded-lg">
+          <p className="text-sm font-bold">Ticket Sold</p>
+          <p className="text-sm text-gray-500">Jun - Sep 2024</p>
+          <p className="text-2xl font-semibold">78</p>
+          <p className="text-red-500 text-sm">▼ 15.34% from last week</p>
+        </div>
+        <div className="bg-gray-300 p-4 rounded-lg">
+          <p className="text-sm font-bold">Orders</p>
+          <p className="text-sm text-gray-500">Jun - Sep 2024</p>
+          <p className="text-2xl font-semibold">45</p>
+          <p className="text-green-500 text-sm">▲ 38.87% from last week</p>
+        </div>
+      </div>
+
+      {/* Chart Placeholder */}
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h2 className="text-lg font-bold mb-4">Report Statistics</h2>
+        {/* Chart component will go here in future */}
+        <div className="h-64 bg-gray-200 flex items-center justify-center">
+          <p className="text-gray-600">Chart will go here</p>
+        </div>
+      </div>
+
+      {/* Event Table */}
+      <div className="bg-white p-4 rounded-lg shadow">
+        <h2 className="text-lg font-bold mb-4">Event List</h2>
+        <table className="table-auto w-full">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="px-4 py-2">No</th>
+              <th className="px-4 py-2">Event Name</th>
+              <th className="px-4 py-2">Location</th>
+              <th className="px-4 py-2">Seat Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="text-center">
+              <td className="border px-4 py-2">1</td>
+              <td className="border px-4 py-2">Afgan Comeback</td>
+              <td className="border px-4 py-2">Jakarta</td>
+              <td className="border px-4 py-2">50 / 100</td>
+            </tr>
+            <tr className="text-center">
+              <td className="border px-4 py-2">2</td>
+              <td className="border px-4 py-2">Ed Sheeran Live In Bandung</td>
+              <td className="border px-4 py-2">Bandung</td>
+              <td className="border px-4 py-2">65 / 100</td>
+            </tr>
+            <tr className="text-center">
+              <td className="border px-4 py-2">3</td>
+              <td className="border px-4 py-2">Rizky Febian BD Love Story</td>
+              <td className="border px-4 py-2">Bandung</td>
+              <td className="border px-4 py-2">120 / 200</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

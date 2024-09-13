@@ -21,152 +21,145 @@ export class UserController {
         referralCode,
       } = req.body;
 
-      // Prisma transaction
-      await prisma.$transaction(async (tx) => {
-        // Check if the email is already used
-        const existingUser = await tx.user.findUnique({
-          where: { email: email },
+      // Check if the email is already used
+      const existingUser = await prisma.user.findUnique({
+        where: { email: email },
+      });
+
+      if (existingUser) {
+        return res.status(400).send({
+          status: 'error',
+          msg: 'Email has already been used!',
+        });
+      }
+
+      let referralOwnerName: string | null = null;
+      let referrerId: number | null = null;
+
+      // Hash the password
+      const salt = await genSalt(10);
+      const hashPassword = await hash(password, salt);
+
+      // Generate a new unique code for the user
+      const userUniqueCode = await generateReferralCode(firstName);
+
+      let user; // Declare user here so it is accessible in all blocks
+
+      if (referralCode) {
+        // Validate referral code if provided
+        const existingReferralCode = await prisma.user.findUnique({
+          where: { userUniqueCode: referralCode },
         });
 
-        if (existingUser) {
+        if (!existingReferralCode) {
           return res.status(400).send({
             status: 'error',
-            msg: 'Email has already been used!',
+            msg: 'Referral code is invalid!',
           });
         }
 
-        let referralOwnerName: string | null = null;
-        let referrerId: number | null = null;
+        referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
+        referrerId = existingReferralCode.id;
 
-        // Hash the password
-        const salt = await genSalt(10);
-        const hashPassword = await hash(password, salt);
-
-        // Generate a new unique code for the user
-        const userUniqueCode = await generateReferralCode(firstName);
-
-        let user; // Declare user here so it is accessible in all blocks
-
-        if (referralCode) {
-          // Validate referral code if provided
-          const existingReferralCode = await tx.user.findUnique({
-            where: { userUniqueCode: referralCode },
-          });
-
-          if (!existingReferralCode) {
-            return res.status(400).send({
-              status: 'error',
-              msg: 'Referral code is invalid!',
-            });
-          }
-
-          referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
-          referrerId = existingReferralCode.id;
-
-          // Create the new user with referral code
-          user = await tx.user.create({
-            data: {
-              firstName,
-              lastName,
-              email,
-              password: hashPassword,
-              phone,
-              userType,
-              referralCode: referralCode || null, // Store referral code if provided
-              userUniqueCode,
-            },
-          });
-
-          // Add points to the referrer and update total points
-          const pointsToAward = 10000;
-
-          await tx.user.update({
-            where: { id: referrerId },
-            data: {
-              points: {
-                increment: pointsToAward, // Increment referrer's total points
-              },
-            },
-          });
-
-          // Record point history
-          await tx.points.create({
-            data: {
-              userId: referrerId,
-              points: pointsToAward,
-              expiresAt: new Date(
-                new Date().setMonth(new Date().getMonth() + 3),
-              ), // Points expire in 3 months
-              expired: false,
-            },
-          });
-
-          // Record the referral usage
-          await tx.referral.create({
-            data: {
-              referrerId: referrerId,
-              referredId: user.id,
-            },
-          });
-        } else {
-          // Create the user without referral code
-          user = await tx.user.create({
-            data: {
-              firstName,
-              lastName,
-              email,
-              password: hashPassword,
-              phone,
-              userType,
-              referralCode: referralCode || null, // Store referral code if provided
-              userUniqueCode,
-            },
-          });
-        }
-
-        // Send verification email
-        const payload = { id: user.id };
-        const token = sign(payload, process.env.SECRET_JWT!, {
-          expiresIn: '10m',
-        });
-
-        const templatePath = path.join(
-          __dirname,
-          '../templates',
-          'verification.hbs',
-        );
-        const templateSource = fs.readFileSync(templatePath, 'utf-8');
-        const compiledTemplate = handlebars.compile(templateSource);
-        const html = compiledTemplate({
-          name: user.firstName,
-          link: `http://localhost:3000/verify/${token}`,
-        });
-
-        await transporter.sendMail({
-          from: process.env.MAIL_USER,
-          to: user.email,
-          subject: 'Welcome to CaloTiket',
-          html: html,
-        });
-
-        // Create a discount voucher for the newly created user
-        await tx.discount.create({
+        // Create the new user with referral code
+        user = await prisma.user.create({
           data: {
-            userId: user.id, // User ID of the newly created user
-            discountVoucher: 10, // 10% discount
-            validUntil: new Date(
-              new Date().setMonth(new Date().getMonth() + 3),
-            ), // Valid for 3 months
+            firstName,
+            lastName,
+            email,
+            password: hashPassword,
+            phone,
+            userType,
+            referralCode: referralCode || null, // Store referral code if provided
+            userUniqueCode,
           },
         });
 
-        // Send the response
-        res.status(201).send({
-          status: 'ok',
-          msg: 'Account created successfully!',
-          user,
-          referralOwnerName,
+        // Add points to the referrer and update total points
+        const pointsToAward = 10000;
+
+        await prisma.user.update({
+          where: { id: referrerId },
+          data: {
+            points: {
+              increment: pointsToAward, // Increment referrer's total points
+            },
+          },
         });
+
+        // Record point history
+        await prisma.points.create({
+          data: {
+            userId: referrerId,
+            points: pointsToAward,
+            expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Points expire in 3 months
+            expired: false,
+          },
+        });
+
+        // Record the referral usage
+        await prisma.referral.create({
+          data: {
+            referrerId: referrerId,
+            referredId: user.id,
+          },
+        });
+      } else {
+        // Create the user without referral code
+        user = await prisma.user.create({
+          data: {
+            firstName,
+            lastName,
+            email,
+            password: hashPassword,
+            phone,
+            userType,
+            referralCode: referralCode || null, // Store referral code if provided
+            userUniqueCode,
+          },
+        });
+      }
+
+      // Send verification email
+      const payload = { id: user.id };
+      const token = sign(payload, process.env.SECRET_JWT!, {
+        expiresIn: '10m',
+      });
+
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'verification.hbs',
+      );
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+      const compiledTemplate = handlebars.compile(templateSource);
+      const html = compiledTemplate({
+        name: user.firstName,
+        link: `http://localhost:3000/verify/${token}`,
+      });
+
+      await transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: 'Welcome to CaloTiket',
+        html: html,
+      });
+
+      // Create a discount voucher for the newly created user
+      await prisma.discount.create({
+        data: {
+          userId: user.id, // User ID of the newly created user
+          discountVoucher: 10, // 10% discount
+          validUntil: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Valid for 3 months
+        },
+      });
+
+      // Send the response
+      res.status(201).send({
+        status: 'ok',
+        msg: 'Account created successfully!',
+        user,
+        referralOwnerName,
       });
     } catch (err) {
       console.error(err);

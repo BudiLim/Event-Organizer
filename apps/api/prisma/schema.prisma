@@ -38,20 +38,25 @@ model User {
   Discount       Discount[]
 }
 
+enum IsPaidEvent {
+  Free
+  Paid
+}
+
 model Event {
-  id             Int      @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   organizerId    Int
   name           String
-  price          Float @default(0.0)
+  price          Float       @default(0.0)
   date           DateTime
   time           DateTime
   location       String
   description    String
   image          String
   availableSeats Int
-  isPaidEvent    Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isPaidEvent    IsPaidEvent
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   // Relations
   organizer   User          @relation("OrganizedEvents", fields: [organizerId], references: [id])

@@ -10,44 +10,64 @@ interface MulterRequest extends Request {
 export class EventController {
   async createEvent(req: MulterRequest, res: Response) {
     try {
-      if (!req.file) throw 'no file uploaded';
+      if (!req.file) throw new Error('No file uploaded');
 
-      const link = `http://localhost:8000/api/public/event/${req?.file?.filename}`;
+      const link = `http://localhost:8000/api/public/event/${req.file.filename}`;
 
       const {
         name,
         price,
         location,
         description,
+        isPaidEvent,
         availableSeats,
         organizerId,
         date,
         time,
       } = req.body;
 
+      // Parse and validate fields
+      const parsedPrice = parseFloat(price);
+      const parsedSeats = parseInt(availableSeats);
+      const parsedOrganizerId = parseInt(organizerId);
+      const parsedDate = new Date(date);
+      const parsedTime = new Date(time);
+
+      // Validate values
+      if (isNaN(parsedPrice)) throw new Error('Price must be a valid number');
+      if (isNaN(parsedSeats)) throw new Error('Available Seats must be a valid number');
+      if (isNaN(parsedOrganizerId)) throw new Error('Organizer ID must be a valid number');
+      if (isNaN(parsedDate.getTime())) throw new Error('Invalid date format');
+      if (isNaN(parsedTime.getTime())) throw new Error('Invalid time format');
+
+      // Create event
       const event = await prisma.event.create({
         data: {
           name,
-          price: parseFloat(price), // Make sure price is a float
+          price: parsedPrice,
           location,
           description,
-          availableSeats: parseInt(availableSeats), // Ensure availableSeats is an integer
-          date: new Date(date), // Ensure date is a Date object
-          time: new Date(time), // Ensure time is a Date object
+          availableSeats: parsedSeats,
+          isPaidEvent,
+          date: parsedDate,
+          time: parsedTime,
           image: link,
-          organizerId: parseInt(organizerId), // Ensure organizerId is an integer
+          organizerId: parsedOrganizerId,
         },
       });
 
       res.status(201).json(event);
     } catch (err) {
-      res.status(400).send({
-        msg: err,
+      console.error('Error creating event:', err); // Log error details
+      res.status(500).send({
+        status: 'error',
+        msg: 'Internal server error',
+        details: err instanceof Error ? err.message : 'Unknown error',
       });
     }
   }
 
-  async getEvent(req: MulterRequest, res: Response) {
+  async getEvent(req: Request, res: Response) {
     try {
       const { search } = req.query;
       let filter: Prisma.EventWhereInput = {};
@@ -55,18 +75,21 @@ export class EventController {
       if (search) {
         filter.name = { contains: search as string };
       }
-      const event = await prisma.event.findMany({
+      const events = await prisma.event.findMany({
         where: filter,
         include: { organizer: true },
         orderBy: { createdAt: 'desc' },
       });
       res.status(200).send({
         status: 'ok',
-        event,
+        events,
       });
     } catch (err) {
-      res.status(400).send({
-        msg: err,
+      console.error('Error fetching events:', err); // Log error details
+      res.status(500).send({
+        status: 'error',
+        msg: 'Internal server error',
+        details: err instanceof Error ? err.message : 'Unknown error',
       });
     }
   }
