@@ -31,7 +31,7 @@ CREATE TABLE `Event` (
     `description` VARCHAR(191) NOT NULL,
     `image` VARCHAR(191) NOT NULL,
     `availableSeats` INTEGER NOT NULL,
-    `isPaidEvent` BOOLEAN NOT NULL DEFAULT false,
+    `isPaidEvent` ENUM('Free', 'Paid') NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
