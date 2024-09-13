@@ -17,6 +17,7 @@ export interface IUserLogin {
 export interface DecodedToken {
   id: string;
   userType: string;
+  organizerId: string;
 }
 
 export interface Referral {
@@ -38,18 +39,21 @@ export interface IUserState {
 }
 
 export interface Event {
-  id: number;
-  name: string;
-  location: string;
-  availableSeats: number;
-  ticketsSold: number;
-}
-
-export interface DashboardData {
-  fullName: string;
-  totalRevenue: number;
-  totalOrders: number;
-  events: Event[];
-  previousWeekRevenue: number;
-  previousWeekTicketsSold: number;
-}
+    id: number;
+    name: string;
+    location: string;
+    isPaidEvent: string;
+    price: string;
+    availableSeats: number;
+  }
+  
+  export interface DashboardData {
+    fullName: string;
+    totalRevenue: number;
+    totalOrders: number;
+    totalTicketsSold: number;
+    events: Event[];
+    previousWeekRevenue: number; // Added field for comparison
+    previousWeekTicketsSold: number; // Added field for comparison
+    previousWeekOrders: number;
+  }

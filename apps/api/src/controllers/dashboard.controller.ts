@@ -11,6 +11,14 @@ export class DashboardController {
       return res.status(400).json({ status: 'error', message: 'Invalid organizer ID' });
     }
 
+    const { startDate, endDate } = req.query;
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+
+    if (!start || !end) {
+      return res.status(400).json({ status: 'error', message: 'Invalid date range' });
+    }
+
     try {
       // Fetch organizer's name
       const organizer = await prisma.user.findUnique({
@@ -27,7 +35,7 @@ export class DashboardController {
       // Fetch events organized by the user
       const events = await prisma.event.findMany({
         where: { organizerId },
-        select: { id: true, name: true, location: true, availableSeats: true },
+        select: { id: true, name: true, location: true, isPaidEvent: true, price: true, availableSeats: true },
       });
 
       // Calculate total revenue and orders
@@ -47,6 +55,25 @@ export class DashboardController {
         where: { event: { organizerId } }
       });
 
+      // Fetch previous week data for comparison
+      const previousWeekStart = new Date(start);
+      previousWeekStart.setDate(start.getDate() - 7);
+      const previousWeekEnd = new Date(end);
+      previousWeekEnd.setDate(end.getDate() - 7);
+
+      const previousWeekRevenueData = await prisma.transaction.findMany({
+        where: { event: { organizerId }, transactionDate: { gte: previousWeekStart, lte: previousWeekEnd } },
+        select: { amount: true },
+      });
+
+      const previousWeekRevenue = previousWeekRevenueData.reduce(
+        (sum: number, transaction: { amount: number }) => sum + transaction.amount,
+        0
+      );
+      const previousWeekTicketsSold = await prisma.ticket.count({
+        where: { event: { organizerId }, purchaseDate: { gte: previousWeekStart, lte: previousWeekEnd } },
+      });
+
       return res.status(200).json({
         status: 'success',
         data: {
@@ -55,6 +82,9 @@ export class DashboardController {
           totalOrders,
           totalTicketsSold,
           events,
+          previousWeekRevenue,
+          previousWeekTicketsSold,
+          previousWeekOrders: previousWeekTicketsSold,
         },
       });
     } catch (error) {

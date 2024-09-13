@@ -1,33 +1,14 @@
 'use client';
 import { getOrganizerDashboardData } from '@/lib/dashboard';
 import { getToken } from '@/lib/server';
+import { DashboardData, DecodedToken } from '@/type/user';
+import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
-import { DateRangePicker } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // Import styles
-import 'react-date-range/dist/theme/default.css'; // Import theme
-
-interface Event {
-  id: number;
-  name: string;
-  location: string;
-  availableSeats: number;
-}
-
-interface DashboardData {
-  fullName: string;
-  totalRevenue: number;
-  totalOrders: number;
-  events: Event[];
-  previousWeekRevenue: number; // Added field for comparison
-  previousWeekTicketsSold: number; // Added field for comparison
-}
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const [dateRange, setDateRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -43,7 +24,10 @@ const Dashboard = () => {
       }
 
       try {
-        const organizerId = '1'; // Replace with dynamic ID if necessary
+        // Decode the token to extract organizerId
+        const decodedToken: DecodedToken = jwtDecode(token);
+        const organizerId = decodedToken.id;
+
         const { result, ok } = await getOrganizerDashboardData(
           organizerId,
           dateRange.startDate,
@@ -64,14 +48,6 @@ const Dashboard = () => {
 
     fetchData();
   }, [dateRange]);
-
-  const handleDateChange = (ranges: any) => {
-    const { selection } = ranges;
-    setDateRange({
-      startDate: selection.startDate,
-      endDate: selection.endDate,
-    });
-  };
 
   const calculatePercentageChange = (current: number, previous: number) => {
     if (previous === 0) return 'N/A';
@@ -94,41 +70,29 @@ const Dashboard = () => {
     data.previousWeekRevenue,
   );
   const ticketsChange = calculatePercentageChange(
-    data.events.reduce((acc, event) => acc + event.availableSeats, 0),
+    data.totalTicketsSold,
     data.previousWeekTicketsSold,
   );
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{data.fullName}</h1>
-        <p className="text-lg">My Dashboard</p>
+        <p className="text-3xl">My Dashboard</p>
       </header>
-
-      {/* Date Range Picker */}
-      <div className="mb-6">
-        <DateRangePicker
-          ranges={[dateRange]}
-          onChange={handleDateChange}
-          months={2}
-          direction="horizontal"
-        />
-      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-gray-300 p-4 rounded-lg">
-          <p className="text-sm font-bold">Total Revenue</p>
-          <p className="text-sm text-gray-500">{`${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`}</p>
-          <p className="text-2xl font-semibold">
+          <p className="text-sm font-bold pb-2 text-center">Total Revenue</p>
+          <p className="text-2xl font-semibold pb-2 text-center">
             Rp. {data.totalRevenue.toLocaleString('id-ID')}
           </p>
           <p
             className={
               data.totalRevenue > data.previousWeekRevenue
-                ? 'text-green-500 text-sm'
-                : 'text-red-500 text-sm'
+                ? 'text-green-500 text-sm text-center'
+                : 'text-red-500 text-sm text-center'
             }
           >
             {getChangeIndicator(data.totalRevenue, data.previousWeekRevenue)}{' '}
@@ -136,33 +100,39 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="bg-gray-300 p-4 rounded-lg">
-          <p className="text-sm font-bold">Tickets Sold</p>
-          <p className="text-sm text-gray-500">{`${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`}</p>
-          <p className="text-2xl font-semibold">
-            {data.events.reduce((acc, event) => acc + event.availableSeats, 0)}
+          <p className="text-sm font-bold pb-2 text-center">Tickets Sold</p>
+          <p className="text-2xl font-semibold pb-2 text-center">
+            {data.totalTicketsSold}
           </p>
           <p
             className={
-              data.events.reduce(
-                (acc, event) => acc + event.availableSeats,
-                0,
-              ) > data.previousWeekTicketsSold
-                ? 'text-green-500 text-sm'
-                : 'text-red-500 text-sm'
+              data.totalTicketsSold > data.previousWeekTicketsSold
+                ? 'text-green-500 text-sm text-center'
+                : 'text-red-500 text-sm text-center'
             }
           >
             {getChangeIndicator(
-              data.events.reduce((acc, event) => acc + event.availableSeats, 0),
+              data.totalTicketsSold,
               data.previousWeekTicketsSold,
             )}{' '}
             {ticketsChange} from last week
           </p>
         </div>
         <div className="bg-gray-300 p-4 rounded-lg">
-          <p className="text-sm font-bold">Orders</p>
-          <p className="text-sm text-gray-500">{`${dateRange.startDate.toLocaleDateString()} - ${dateRange.endDate.toLocaleDateString()}`}</p>
-          <p className="text-2xl font-semibold">{data.totalOrders}</p>
-          <p className="text-green-500 text-sm">▲ 38.87% from last week</p>
+          <p className="text-sm font-bold pb-2 text-center">Orders</p>
+          <p className="text-2xl font-semibold pb-2 text-center">
+            {data.totalOrders}
+          </p>
+          <p
+            className={
+              data.totalOrders > data.previousWeekOrders
+                ? 'text-green-500 text-sm text-center'
+                : 'text-red-500 text-sm text-center'
+            }
+          >
+            {getChangeIndicator(data.totalOrders, data.previousWeekOrders)}{' '}
+            {ticketsChange} from last week
+          </p>
         </div>
       </div>
 
@@ -187,6 +157,8 @@ const Dashboard = () => {
                 <th className="px-4 py-2">No</th>
                 <th className="px-4 py-2">Event Name</th>
                 <th className="px-4 py-2">Location</th>
+                <th className="px-4 py-2">Ticket Type</th>
+                <th className="px-4 py-2">Ticket Price</th>
                 <th className="px-4 py-2">Seat Quantity</th>
               </tr>
             </thead>
@@ -196,6 +168,8 @@ const Dashboard = () => {
                   <td className="border px-4 py-2">{index + 1}</td>
                   <td className="border px-4 py-2">{event.name}</td>
                   <td className="border px-4 py-2">{event.location}</td>
+                  <td className="border px-4 py-2">{event.isPaidEvent}</td>
+                  <td className="border px-4 py-2">{event.price}</td>
                   <td className="border px-4 py-2">{event.availableSeats}</td>
                 </tr>
               ))}
@@ -211,6 +185,8 @@ const Dashboard = () => {
                 {index + 1}. {event.name}
               </p>
               <p className="text-gray-600">Location: {event.location}</p>
+              <p className="text-gray-600">Ticket Type: {event.isPaidEvent}</p>
+              <p className="text-gray-600">Ticket Price: {event.price}</p>
               <p className="text-gray-600">
                 Seat Quantity: {event.availableSeats}
               </p>
