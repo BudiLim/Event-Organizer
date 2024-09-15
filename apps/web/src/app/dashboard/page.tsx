@@ -76,13 +76,14 @@ const Dashboard = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center mb-3">
         <h1 className="text-2xl font-bold">{data.fullName}</h1>
         <p className="text-3xl">My Dashboard</p>
       </header>
+      <div className='border border-slate-400'/>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 pt-5">
         <div className="bg-gray-300 p-4 rounded-lg">
           <p className="text-sm font-bold pb-2 text-center">Total Revenue</p>
           <p className="text-2xl font-semibold pb-2 text-center">

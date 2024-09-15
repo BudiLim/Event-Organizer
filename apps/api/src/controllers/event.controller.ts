@@ -61,9 +61,12 @@ export class EventController {
           name,
           location,
           description,
-          availableSeats: parsedAvailableSeats,
-          date: new Date(date),
-          time: new Date(time),
+          availableSeats: parseInt(availableSeats), // Ensure availableSeats is an integer
+          isPaidEvent,
+          eventDate: new Date(date), // Ensure date is a Date object
+          eventTime: new Date(time), // Ensure time is a Date object
+          sellEndDate: new Date(date),
+          sellEndTime: new Date(time),
           image: link,
           isPaidEvent: eventType,
         },
