@@ -12,15 +12,6 @@ import hozier from '../../assets/hozier.png';
 import adele from '../../assets/adele.png';
 import rf from '../../assets/rizki_febian.png';
 import ed_sheeran from '../../assets/ed_sheeran.png';
-import black_pink from '../../assets/black_pink.png';
-import coldplay from '../../assets/Coldplay.png';
-import jkt48 from '../../assets/jkt48.png';
-import twice from '../../assets/twice.png';
-import one_direction from '../../assets/one_direction.png';
-import fifth_harmony from '../../assets/fifth_harmony.png';
-import alan_walker from '../../assets/alan_walker.png';
-import marshmello from '../../assets/marshmello.png';
-import snake from '../../assets/snake.png';
 import Link from 'next/link';
 
 const SingleBands = [

@@ -16,7 +16,7 @@ export class TicketRouter {
     this.router.get('/:userId', this.ticketController.getMyTicketDetails);
 
     // Route to get a specific ticket by ID for a specific user
-    this.router.get('/:userId/myticket/:id', this.ticketController.getTicketByUserIdAndTicketId);
+    this.router.get('/:userId/:id', this.ticketController.getTicketId);
   }
 
   getRouter(): Router {
