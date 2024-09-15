@@ -1,6 +1,55 @@
+'use client';
+import { getMyTicketDetails } from '@/lib/ticket';
+import { getToken } from '@/lib/server';
+import { DecodedToken, TicketDetails } from '@/type/user';
+import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-export default function MyTicket() {
+const MyTicket = () => {
+  const [data, setData] = useState<TicketDetails | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = await getToken();
+      if (!token) {
+        setError('No access token found');
+        setLoading(false);
+        return;
+      }
+      try {
+        // Decode the token to extract userId
+        const decodedToken: DecodedToken = jwtDecode(token);
+        const userId = decodedToken.id;
+
+        const { result, ok } = await getMyTicketDetails(userId);
+
+        if (ok) {
+          setData(result.data);
+        } else {
+          setError(result.message || 'Failed to fetch data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!data) return <p>No ticket found</p>;
+
+  // Function ganti angka harga
+  const formatPrice = (price: number) => {
+    return `Rp. ${new Intl.NumberFormat('id-ID').format(price)}`;
+  };
+
   return (
     <section className="relative w-full h-full flex justify-center items-center py-[78px] px-5">
       <div className="lg:w-[80%] w-full shadow-lg bg-white rounded-lg p-6">
@@ -16,113 +65,78 @@ export default function MyTicket() {
 
         {/* Ticket Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
+          <table className="min-w-full bg-white text-center">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   No
                 </th>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Event Name
                 </th>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date & Time
                 </th>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Seat No.
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Purchase Date
                 </th>
-                <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Price
+                </th>
+                <th className="px-2 md:px-4 py-2 md:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Ticket Status
                 </th>
                 <th className="px-2 md:px-4 py-2 md:py-3"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {/* row 1 */}
-              <tr>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  1
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-ticket/details'}>Afgan Comeback</Link>
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  Jakarta
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  10 September 2024 / 19:00 WIB
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  AF-001
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  Rp. 440.000,-
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-ticket/details'}>details</Link>
-                  </button>
-                </td>
-              </tr>
-              {/* row 2 */}
-              <tr>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  2
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-ticket/details'}>
-                    Ed Sheeran Live In Bandung
-                  </Link>
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  Bandung
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  8 December 2024 / 19:00 WIB
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  ES-001
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  Rp. 2.500.000,-
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-ticket/details'}>details</Link>
-                  </button>
-                </td>
-              </tr>
-              {/* row 3 */}
-              <tr>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  3
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
-                  <Link href={'/my-ticket/details'}>
-                    Rizky Febian Bandung Love Story
-                  </Link>
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  Bandung
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  10 Oktober 2024 / 17:00 WIB
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  RB-001
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                  FREE
-                </td>
-                <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="btn btn-ghost btn-xs">
-                    <Link href={'/my-ticket/details'}>details</Link>
-                  </button>
-                </td>
-              </tr>
+              {data?.tickets?.length > 0 ? (
+                data.tickets.map((ticket, index) => (
+                  <tr key={ticket.id}>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {index + 1}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-black hover:underline hover:text-blue-500">
+                      <Link href={`/my-ticket/${ticket.id}`}>
+                        {ticket.event.name}
+                      </Link>
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
+                      {ticket.event.location}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(ticket.event.eventDate).toLocaleDateString()} /{' '}
+                      {new Date(ticket.event.eventTime).toLocaleTimeString()}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(ticket.purchaseDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatPrice(ticket.price)}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
+                      {ticket.status}
+                    </td>
+                    <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button className="btn btn-ghost btn-xs">
+                        <Link href={`/my-ticket/${ticket.id}`}>details</Link>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-2 md:px-4 py-2 md:py-4 text-center text-sm text-gray-900"
+                  >
+                    No tickets found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -141,4 +155,6 @@ export default function MyTicket() {
       </div>
     </section>
   );
-}
+};
+
+export default MyTicket;

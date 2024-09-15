@@ -34,8 +34,10 @@ export class EventController {
           description,
           availableSeats: parseInt(availableSeats), // Ensure availableSeats is an integer
           isPaidEvent,
-          date: new Date(date), // Ensure date is a Date object
-          time: new Date(time), // Ensure time is a Date object
+          eventDate: new Date(date), // Ensure date is a Date object
+          eventTime: new Date(time), // Ensure time is a Date object
+          sellEndDate: new Date(date),
+          sellEndTime: new Date(time),
           image: link,
           organizerId: parseInt(organizerId), // Ensure organizerId is an integer
         },
