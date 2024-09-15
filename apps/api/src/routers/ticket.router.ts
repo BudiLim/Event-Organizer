@@ -1,4 +1,5 @@
 import { TicketController } from '@/controllers/tiket.controller';
+import { checkExperience, verifyToken } from '@/middlewares/token';
 import { Router } from 'express';
 
 export class TicketRouter {
@@ -13,10 +14,10 @@ export class TicketRouter {
 
   private initializeRoutes(): void {
     // Route to get all tickets for a specific user
-    this.router.get('/:userId', this.ticketController.getMyTicketDetails);
+    this.router.get('/:userId', verifyToken,checkExperience, this.ticketController.getMyTicketDetails);
 
     // Route to get a specific ticket by ID for a specific user
-    this.router.get('/:userId/:id', this.ticketController.getTicketId);
+    this.router.get('/:userId/:id', verifyToken, checkExperience,this.ticketController.getTicketId);
   }
 
   getRouter(): Router {
