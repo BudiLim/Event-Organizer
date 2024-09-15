@@ -6,64 +6,74 @@ import multer from 'multer';
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
-
 export class EventController {
   async createEvent(req: MulterRequest, res: Response) {
     try {
+      console.log('Received request:', req.body);
+
       if (!req.file) throw new Error('No file uploaded');
 
       const link = `http://localhost:8000/api/public/event/${req.file.filename}`;
 
       const {
-        name,
-        price,
-        location,
-        description,
-        isPaidEvent,
-        availableSeats,
         organizerId,
+        name,
         date,
         time,
+        location,
+        description,
+        availableSeats,
+        isPaidEvent,
       } = req.body;
 
-      // Parse and validate fields
-      const parsedPrice = parseFloat(price);
-      const parsedSeats = parseInt(availableSeats);
+      // Validate required fields
+      if (!organizerId || !name || !date || !time || !location || !description || !availableSeats || !isPaidEvent) {
+        return res.status(400).json({ msg: 'All fields are required' });
+      }
+
+      // Parse fields
       const parsedOrganizerId = parseInt(organizerId);
-      const parsedDate = new Date(date);
-      const parsedTime = new Date(time);
+      const parsedAvailableSeats = parseInt(availableSeats);
 
-      // Validate values
-      if (isNaN(parsedPrice)) throw new Error('Price must be a valid number');
-      if (isNaN(parsedSeats)) throw new Error('Available Seats must be a valid number');
-      if (isNaN(parsedOrganizerId)) throw new Error('Organizer ID must be a valid number');
-      if (isNaN(parsedDate.getTime())) throw new Error('Invalid date format');
-      if (isNaN(parsedTime.getTime())) throw new Error('Invalid time format');
+      // Ensure parsed values are valid
+      if (isNaN(parsedOrganizerId) || isNaN(parsedAvailableSeats)) {
+        return res.status(400).json({ msg: 'Invalid input values' });
+      }
 
-      // Create event
+      // Map the isPaidEvent string to the enum value
+      const eventType = isPaidEvent === 'Paid' ? 'Paid' : 'Free';
+
+      console.log('Creating event with data:', {
+        organizerId: parsedOrganizerId,
+        name,
+        location,
+        description,
+        availableSeats: parsedAvailableSeats,
+        date: new Date(date),
+        time: new Date(time),
+        image: link,
+        isPaidEvent: eventType,
+      });
+
       const event = await prisma.event.create({
         data: {
+          organizerId: parsedOrganizerId,
           name,
-          price: parsedPrice,
           location,
           description,
-          availableSeats: parsedSeats,
-          isPaidEvent,
-          date: parsedDate,
-          time: parsedTime,
+          availableSeats: parsedAvailableSeats,
+          date: new Date(date),
+          time: new Date(time),
           image: link,
-          organizerId: parsedOrganizerId,
+          isPaidEvent: eventType,
         },
       });
+      console.log(event)
 
       res.status(201).json(event);
     } catch (err) {
-      console.error('Error creating event:', err); // Log error details
-      res.status(500).send({
-        status: 'error',
-        msg: 'Internal server error',
-        details: err instanceof Error ? err.message : 'Unknown error',
-      });
+      console.error('Error creating event:', err);
+      res.status(500).json({ msg: 'Internal server error' });
     }
   }
 
@@ -75,22 +85,20 @@ export class EventController {
       if (search) {
         filter.name = { contains: search as string };
       }
+
       const events = await prisma.event.findMany({
         where: filter,
         include: { organizer: true },
         orderBy: { createdAt: 'desc' },
       });
-      res.status(200).send({
+
+      res.status(200).json({
         status: 'ok',
         events,
       });
     } catch (err) {
-      console.error('Error fetching events:', err); // Log error details
-      res.status(500).send({
-        status: 'error',
-        msg: 'Internal server error',
-        details: err instanceof Error ? err.message : 'Unknown error',
-      });
+      console.error('Error fetching events:', err);
+      res.status(500).json({ msg: 'Internal server error' });
     }
   }
 }

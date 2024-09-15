@@ -17,7 +17,6 @@ export class EventRouter {
         this.router.post('/', uploader('event-', '/event').single('image'), this.eventController.createEvent)
         this.router.get('/', this.eventController.getEvent)
 
-        console.log("Event routes initialized"); 
     }
 
     getRouter(): Router{

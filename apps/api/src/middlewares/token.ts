@@ -13,7 +13,7 @@ export const verifyToken = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
     console.log('Token:', token); // Log the token
 
     if (!token) throw new Error('Token is missing');

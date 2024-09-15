@@ -5,7 +5,7 @@ import hero from '../../assets/dynamic/hero_landing_page.png';
 import hero2 from '../../assets/dynamic/music1.png';
 import hero3 from '../../assets/dynamic/Blackpink.png';
 import hero4 from '../../assets/dynamic/Marshmello_Fornite_Concert.png';
-import hero5 from '../../assets/dynamic/Tim_Renai_Kinshi_Jourei.png';
+import hero5 from '../../assets/dynamic/Tim_Renai_Kinshi_Jourei.webp';
 import afgan from '../../assets/afgan.png';
 import billie_eilish from '../../assets/billie_eilish.png';
 import hozier from '../../assets/hozier.png';
