@@ -55,16 +55,16 @@ const DetailEvent = () => {
                                         type=""
                                         value={ticketCount}
                                         onChange={handleInputChange}
-                                        className="w-10 text-center text-black border border-gray-300 rounded"
+                                        className="w-10 text-center bg-black border border-gray-300 rounded text-white"
 
                                     />
                                     <FiPlusCircle onClick={plusCount} size={26} />
                                 </div>
                             </div>
                         </div>
-                        <div className='flex flex-col gap-2'>
+                        <div className='flex flex-col gap-2 text-white font-normal'>
                             <h1>Discount Voucher</h1>
-                            <input type="text" placeholder='Refferal Code Here . . .' className='input input-bordered text-black' />
+                            <input type="text" placeholder='Discount Code Here . . .' className='input input-bordered bg-slate-800' />
                         </div>
                     </div>
 

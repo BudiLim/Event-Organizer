@@ -1,7 +1,7 @@
 import prisma from '@/prisma';
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import multer from 'multer';
+import multer = require('multer');
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
@@ -10,9 +10,9 @@ interface MulterRequest extends Request {
 export class EventController {
   async createEvent(req: MulterRequest, res: Response) {
     try {
-      if (!req.file) throw 'no file uploaded';
+      if (!req.file) throw new Error('no file uploaded'); // Lebih baik gunakan Error object
 
-      const link = `http://localhost:8000/api/public/event/$(req?.file?.filename)`;
+      const link = `http://localhost:8000/api/public/event/${req?.file?.filename}`;
 
       const {
         name,
@@ -22,31 +22,38 @@ export class EventController {
         isPaidEvent,
         availableSeats,
         organizerId,
-        date,
-        time,
+        eventDate,
+        eventTime, // Mengelola waktu terpisah
+        sellEndDate, // Tanggal berakhir penjualan (tambahkan di request body)
+        sellEndTime, // Waktu berakhir penjualan (tambahkan di request body)
       } = req.body;
+
+      const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+      const sellEndDateTime = new Date(`${sellEndDate}T${sellEndTime}`);
+
+
 
       const event = await prisma.event.create({
         data: {
           name,
-          price: parseFloat(price), // Make sure price is a float
+          price: parseFloat(price),
           location,
           description,
-          availableSeats: parseInt(availableSeats), // Ensure availableSeats is an integer
-          isPaidEvent,
-          eventDate: new Date(date), // Ensure date is a Date object
-          eventTime: new Date(time), // Ensure time is a Date object
-          sellEndDate: new Date(date),
-          sellEndTime: new Date(time),
+          isPaidEvent, 
+          availableSeats: parseInt(availableSeats, 10),
+          eventDate: new Date(eventDate), // Tetap sebagai tanggal
+          eventTime: eventDateTime, // Waktu khusus event
+          sellEndDate: new Date(sellEndDate), // Tetap sebagai tanggal untuk akhir penjualan
+          sellEndTime: sellEndDateTime, // Waktu untuk akhir penjualan
           image: link,
-          organizerId: parseInt(organizerId), // Ensure organizerId is an integer
+          organizerId: parseInt(organizerId, 10),
         },
       });
 
       res.status(201).json(event);
     } catch (err) {
       res.status(400).send({
-        msg: err,
+        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
       });
     }
   }
@@ -70,7 +77,7 @@ export class EventController {
       });
     } catch (err) {
       res.status(400).send({
-        msg: err,
+        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
       });
     }
   }
