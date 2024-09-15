@@ -1,86 +1,64 @@
 import prisma from '@/prisma';
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
-import multer from 'multer';
+import multer = require('multer');
 
 interface MulterRequest extends Request {
   file?: Express.Multer.File;
 }
+
 export class EventController {
   async createEvent(req: MulterRequest, res: Response) {
     try {
-      console.log('Received request:', req.body);
+      if (!req.file) throw new Error('no file uploaded'); // Lebih baik gunakan Error object
 
-      if (!req.file) throw new Error('No file uploaded');
-
-      const link = `http://localhost:8000/api/public/event/${req.file.filename}`;
+      const link = `http://localhost:8000/api/public/event/${req?.file?.filename}`;
 
       const {
-        organizerId,
         name,
-        date,
-        time,
+        price,
         location,
         description,
-        availableSeats,
         isPaidEvent,
+        availableSeats,
+        organizerId,
+        eventDate,
+        eventTime, // Mengelola waktu terpisah
+        sellEndDate, // Tanggal berakhir penjualan (tambahkan di request body)
+        sellEndTime, // Waktu berakhir penjualan (tambahkan di request body)
       } = req.body;
 
-      // Validate required fields
-      if (!organizerId || !name || !date || !time || !location || !description || !availableSeats || !isPaidEvent) {
-        return res.status(400).json({ msg: 'All fields are required' });
-      }
+      const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+      const sellEndDateTime = new Date(`${sellEndDate}T${sellEndTime}`);
 
-      // Parse fields
-      const parsedOrganizerId = parseInt(organizerId);
-      const parsedAvailableSeats = parseInt(availableSeats);
 
-      // Ensure parsed values are valid
-      if (isNaN(parsedOrganizerId) || isNaN(parsedAvailableSeats)) {
-        return res.status(400).json({ msg: 'Invalid input values' });
-      }
-
-      // Map the isPaidEvent string to the enum value
-      const eventType = isPaidEvent === 'Paid' ? 'Paid' : 'Free';
-
-      console.log('Creating event with data:', {
-        organizerId: parsedOrganizerId,
-        name,
-        location,
-        description,
-        availableSeats: parsedAvailableSeats,
-        date: new Date(date),
-        time: new Date(time),
-        image: link,
-        isPaidEvent: eventType,
-      });
 
       const event = await prisma.event.create({
         data: {
-          organizerId: parsedOrganizerId,
           name,
+          price: parseFloat(price),
           location,
           description,
-          availableSeats: parseInt(availableSeats), // Ensure availableSeats is an integer
-          isPaidEvent,
-          eventDate: new Date(date), // Ensure date is a Date object
-          eventTime: new Date(time), // Ensure time is a Date object
-          sellEndDate: new Date(date),
-          sellEndTime: new Date(time),
+          isPaidEvent, 
+          availableSeats: parseInt(availableSeats, 10),
+          eventDate: new Date(eventDate), // Tetap sebagai tanggal
+          eventTime: eventDateTime, // Waktu khusus event
+          sellEndDate: new Date(sellEndDate), // Tetap sebagai tanggal untuk akhir penjualan
+          sellEndTime: sellEndDateTime, // Waktu untuk akhir penjualan
           image: link,
-          isPaidEvent: eventType,
+          organizerId: parseInt(organizerId, 10),
         },
       });
-      console.log(event)
 
       res.status(201).json(event);
     } catch (err) {
-      console.error('Error creating event:', err);
-      res.status(500).json({ msg: 'Internal server error' });
+      res.status(400).send({
+        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
+      });
     }
   }
 
-  async getEvent(req: Request, res: Response) {
+  async getEvent(req: MulterRequest, res: Response) {
     try {
       const { search } = req.query;
       let filter: Prisma.EventWhereInput = {};
@@ -88,20 +66,19 @@ export class EventController {
       if (search) {
         filter.name = { contains: search as string };
       }
-
-      const events = await prisma.event.findMany({
+      const event = await prisma.event.findMany({
         where: filter,
         include: { organizer: true },
         orderBy: { createdAt: 'desc' },
       });
-
-      res.status(200).json({
+      res.status(200).send({
         status: 'ok',
-        events,
+        event,
       });
     } catch (err) {
-      console.error('Error fetching events:', err);
-      res.status(500).json({ msg: 'Internal server error' });
+      res.status(400).send({
+        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
+      });
     }
   }
 }
