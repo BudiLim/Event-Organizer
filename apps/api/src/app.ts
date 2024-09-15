@@ -36,6 +36,8 @@ export default class App {
     this.app.use(cookieParser());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+
+    this.app.use('/api/public', express.static('public'));
   }
 
   private handleError(): void {
@@ -78,6 +80,8 @@ export default class App {
     this.app.use('/api/create-event', eventRouter.getRouter());
     this.app.use('/api/dashboard', dashboardRouter.getRouter());
     this.app.use('/api/ticket', ticketRouter.getRouter());
+    this.app.use('/api/event', eventRouter.getRouter());
+    
   }
 
   public start(): void {
