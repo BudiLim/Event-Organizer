@@ -5,11 +5,7 @@ export const getDashboardData = async (organizerId: number, startDate: Date, end
   // Fetch events within the date range
   const events = await prisma.event.findMany({
     where: {
-      organizerId,
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
+      organizerId
     },
   });
 

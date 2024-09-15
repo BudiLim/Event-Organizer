@@ -48,8 +48,10 @@ model Event {
   organizerId    Int
   name           String
   price          Float       @default(0.0)
-  date           DateTime
-  time           DateTime
+  eventDate      DateTime
+  eventTime      DateTime
+  sellEndDate    DateTime
+  sellEndTime    DateTime
   location       String
   description    String
   image          String
