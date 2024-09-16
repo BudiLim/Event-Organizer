@@ -36,7 +36,8 @@ export interface IUserState {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
+  userType: string;
+  points: number;
 }
 
 export interface Event {
