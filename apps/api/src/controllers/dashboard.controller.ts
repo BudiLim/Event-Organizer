@@ -35,7 +35,7 @@ export class DashboardController {
       // Fetch events organized by the user
       const events = await prisma.event.findMany({
         where: { organizerId },
-        select: { id: true, name: true, location: true, isPaidEvent: true, price: true, availableSeats: true },
+        // select: { id: true, name: true, location: true, isPaidEvent: true, price: true, availableSeats: true },
       });
 
       // Calculate total revenue and orders

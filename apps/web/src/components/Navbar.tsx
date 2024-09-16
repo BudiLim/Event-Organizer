@@ -21,7 +21,7 @@ const Navbar = () => {
     const res = await getToken()
     setToken(res || '')
   }
-  const author = useAppSelector((state) => state.author)
+  const user = useAppSelector((state) => state.author)
   const onLogout = async () => {
     await deleteToken()
     dispatch(logoutAction())
@@ -45,7 +45,7 @@ const Navbar = () => {
     <div className="fixed flex justify-between top-0 z-10 h-[60px] w-full px-[20px] lg:px-[40px] bg-black bg-opacity-70">
 
       {
-        author.id ?
+        user.id ?
           <div className="flex items-center h-full">
             <Link href={'/event'}>
               <Image src={logo} alt="logo" width={35} height={35} objectFit="cover" />
@@ -82,7 +82,7 @@ const Navbar = () => {
         <Link href={'/create-event'} className="font-semibold text-white text-[15px] hover:scale-105">Create Events</Link>
 
         {
-          author.id ?
+          user.id ?
             <div onClick={onLogout}>
               <LogOut />
             </div>
