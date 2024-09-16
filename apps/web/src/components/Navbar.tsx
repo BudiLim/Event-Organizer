@@ -48,6 +48,8 @@ const Navbar = () => {
     console.log('user:', user)
   }, []);
 
+  
+
   return (
     <div className="fixed flex justify-between top-0 z-10 h-[60px] w-full px-[20px] lg:px-[40px] bg-black bg-opacity-70">
       <div className="flex items-center h-full">
@@ -92,7 +94,7 @@ const Navbar = () => {
           <div>
             {checkRole(Role.Organizer) &&
               <div className="dropdown dropdown-end text-white">
-                <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
+                <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white bg-zinc-900 text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
                 <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-44 p-2 shadow">
                   <li><Link href={'/my-event'}>My Event</Link></li>
                   <li><Link href={'/dashboard'}>Dashbord</Link></li>
@@ -106,7 +108,7 @@ const Navbar = () => {
               <div className="flex items-center gap-[30px]">
                 <h1 className="flex items-center gap-1 text-white font-bold text-[15px]"><Image src={coin} alt="coin" width={30} />{user.points}</h1>
                 <div>
-                  <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
+                  <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white  bg-zinc-900  text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
                   <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                     <li><Link href={'/my-ticket'}>My Ticket</Link></li>
                     <li><Link href={'/account-settings'}>Account Setting</Link></li>
@@ -127,13 +129,13 @@ const Navbar = () => {
 
 
       {/* Sidebar for smaller screens */}
-      <div className={`fixed top-0 left-0 h-full w-[250px] bg-[#101010] transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-20`}>
+      <div className={`fixed top-0 left-0 h-full w-[250px]  bg-zinc-900  transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out z-20`}>
         <div className="flex justify-between items-center p-4">
           <FiX size={30} color="white" onClick={toggleSidebar} />
         </div>
         <div className="flex flex-col p-4">
           {checkRole(Role.Organizer) && 
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 ">
             <h1 className="flex gap-3  items-center font-semibold text-white text-[20px] mb-4"><FiUser/>{user.firstName + ' ' + user.lastName}</h1>
             <Link href="/my-event" className="font-semibold text-white text-[15px] mb-4">My event</Link>
             <Link href="/dashboard" className="font-semibold text-white text-[15px] mb-4">DashBoard</Link>
