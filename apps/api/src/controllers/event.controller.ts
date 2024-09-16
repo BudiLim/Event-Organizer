@@ -25,9 +25,14 @@ export class EventController {
         availableSeats,
         organizerId,
         eventDate,
-        eventTime, // Mengelola waktu terpisah
-        sellEndDate, // Tanggal berakhir penjualan
-        sellEndTime, // Waktu berakhir penjualan
+        eventTime,
+        sellEndDate, 
+        sellEndTime,
+        discountCode,
+        amount,
+        quotaAvailable,
+        quotaUsed,
+        validUntil
       } = req.body;
 
       const eventDateTime = new Date(`${eventDate}T${eventTime}`);
@@ -60,6 +65,20 @@ export class EventController {
       const event = await prisma.event.create({
         data: eventData
       });
+
+      if (discountCode && amount && quotaAvailable && validUntil) {
+        const promotionData: Prisma.PromotionCreateInput = {
+          event: { connect: { id: event.id } },
+          discountCode,
+          amount: parseFloat(amount),
+          quotaAvailable,
+          quotaUsed: quotaUsed || "0",
+          validUntil: new Date(validUntil)
+        };
+        await prisma.promotion.create({
+          data: promotionData,
+        })
+      }
 
       res.status(201).json({ event });
     } catch (err) {
