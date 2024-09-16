@@ -51,6 +51,7 @@ export interface Event {
   isPaidEvent: boolean;
   price: number;
   availableSeats: number;
+  ticket: Ticket;
 }
 
 export interface DashboardData {
@@ -70,6 +71,7 @@ export interface Ticket {
   purchaseDate: string;
   price: number;
   status: string;
+  events: Event[];
 }
 
 export interface TicketDetails {
@@ -78,4 +80,6 @@ export interface TicketDetails {
   lastName: string;
   email: string;
   tickets: Ticket[];
+  ticket: Ticket;
+  event: Event;
 }

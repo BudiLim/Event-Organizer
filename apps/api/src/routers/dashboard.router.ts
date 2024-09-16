@@ -1,5 +1,5 @@
 import { DashboardController } from '@/controllers/dashboard.controller';
-import { checkRole, verifyToken } from '@/middlewares/token';
+import { checkExperience, checkOrganizer, verifyToken } from '@/middlewares/token';
 import { Router } from 'express';
 
 export class DashboardRouter {
@@ -18,7 +18,7 @@ export class DashboardRouter {
     this.router.get(
       '/:organizerId',
       verifyToken,
-      checkRole,
+      checkOrganizer,
       this.dashboardController.getOrganizerDashboardData,
     );
   }
