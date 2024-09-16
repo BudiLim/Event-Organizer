@@ -139,7 +139,7 @@ const AccountInfo = () => {
   const sidebarStyle: React.CSSProperties = {
     width: '300px',
     backgroundColor: '#f5f5f5',
-    padding: '20px',
+    padding: '40px 20px 20px 40px',
     boxShadow: '2px 0 5px rgba(0, 0, 0, 0.1)',
     position: 'sticky',
     top: '0px',
@@ -158,7 +158,7 @@ const AccountInfo = () => {
 
   const contentStyle: React.CSSProperties = {
     flex: '1',
-    padding: '20px 20px 20px 30px',
+    padding: '40px 20px 20px 50px',
   };
 
   const formContainerStyle: React.CSSProperties = {
