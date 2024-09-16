@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore, Persistor } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
-import authorReducer from "./slice/authorSlice";
+import userReducer from "./slice/authorSlice";
 import {
     REHYDRATE,
     PERSIST,
@@ -34,7 +34,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-    author: authorReducer,
+    user: userReducer,
 });
 
 const makeConfiguredStore = () =>

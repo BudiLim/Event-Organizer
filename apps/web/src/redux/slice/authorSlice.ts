@@ -6,7 +6,8 @@ const initialState: IUserState = {
     firstName: "",
     lastName: "",
     email: "",
-    role: ""
+    userType: "",
+    points: 0
 }
 
 export const userSlice = createSlice({
@@ -14,20 +15,22 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         loginAction: (state, action: PayloadAction<IUserState>) => {
-            const { id, firstName, lastName, email, role } = action.payload
+            const { id, firstName, lastName, email, userType, points } = action.payload
 
             state.id = id
             state.firstName = firstName
             state.lastName = lastName
             state.email = email
-            state.role = role
+            state.userType = userType
+            state.points = points
         },
         logoutAction: (state) => {
             state.id = 0
             state.firstName = ""
             state.lastName = ""
             state.email = ""
-            state.role = ""
+            state.userType = ""
+            state.points = 0
         }
     }
 })
