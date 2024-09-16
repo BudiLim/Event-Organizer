@@ -40,3 +40,39 @@ export const getTicketId = async (userId: string, id: number) => {
     return { result: null, ok: false, error: error };
   }
 };
+
+// New function for creating a ticket
+export const createTicket = async (
+  eventId: number,
+  price: number, 
+  quantity: number,
+  discountCode?: string
+) => {
+  try {
+    const token = await getToken();
+    
+    const res = await fetch(`${base_url}/ticket`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventId,
+        quantity,
+        price,
+        discountCode,
+      }),
+    });
+
+    const result = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(`Failed to create ticket: ${result.message || res.statusText}`);
+    }
+
+    return { result, ok: true };
+  } catch (error) {
+    return { result: null, ok: false, error: error };
+  }
+};

@@ -1,3 +1,4 @@
+import { TicketService } from '@/middlewares/ticket.service';
 import prisma from '@/prisma';
 import { Request, Response } from 'express';
 
@@ -113,4 +114,35 @@ export class TicketController {
       });
     }
   }
+
+  async createTicket(req: Request, res: Response) {
+    const { eventId, quantity, paymentMethod, discountCode } = req.body;
+    const userId = req.user?.id; // Ensure that req.user is not undefined
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+
+    try {
+      const ticket = await TicketService.purchaseTicket({
+        userId,
+        eventId,
+        quantity,
+        discountCode,
+      });
+
+      return res.status(201).json({
+        status: 'success',
+        ticket,
+      });
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      return res.status(400).json({
+        status: 'error',
+        message: 'Ticket creation failed',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  
 }

@@ -75,7 +75,7 @@ const EventForm: React.FC = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -86,7 +86,7 @@ const EventForm: React.FC = () => {
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -97,7 +97,7 @@ const EventForm: React.FC = () => {
                 name="time"
                 value={formData.time}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -108,7 +108,7 @@ const EventForm: React.FC = () => {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -118,7 +118,7 @@ const EventForm: React.FC = () => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -129,7 +129,7 @@ const EventForm: React.FC = () => {
                 name="availableSeats"
                 value={formData.availableSeats}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
               />
             </div>
 
@@ -169,7 +169,7 @@ const EventForm: React.FC = () => {
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
                 />
                 <div>
                   <label className="block text-slate-300">Discount Code</label>
@@ -178,20 +178,20 @@ const EventForm: React.FC = () => {
                     name="discountCode"
                     value={formData.discountCode}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
                     placeholder="Enter discount code"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-300">Amount</label>
+                  <label className="block text-slate-300">Amount (Percentage %)</label>
                   <input
                     type="number"
                     name="amount"
                     value={formData.amount}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
                     placeholder="Enter discount amount"
                     required
                   />
@@ -204,7 +204,7 @@ const EventForm: React.FC = () => {
                     name="quotaAvailable"
                     value={formData.quotaAvailable}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
                     placeholder="Enter available quota"
                     required
                   />
@@ -217,7 +217,7 @@ const EventForm: React.FC = () => {
                     name="validUntil"
                     value={formData.validUntil}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-white"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
                     required
                   />
                 </div>

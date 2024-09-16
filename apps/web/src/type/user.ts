@@ -84,3 +84,11 @@ export interface TicketDetails {
   ticket: Ticket;
   event: Event;
 }
+
+interface TicketPurchaseData {
+  userId: number;
+  eventId: number;
+  quantity: number;
+  paymentMethod: string;
+  discountCode?: string;
+}

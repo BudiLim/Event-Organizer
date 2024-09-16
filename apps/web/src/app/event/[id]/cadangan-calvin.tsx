@@ -5,6 +5,7 @@ import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 import { useParams } from 'next/navigation';
 import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
+import { createTransaction } from '@/lib/transaction';
 
 interface Event {
   id: number;
@@ -118,8 +119,19 @@ const DetailEvent = () => {
       );
   
       if (ok) {
-        setTicketSuccess('Ticket created successfully!');
-        // Handle further actions after successful ticket creation
+        // Create a transaction after successfully creating a ticket
+        const transactionResponse = await createTransaction({
+          userId: 1, // Replace with the actual user ID
+          eventId: event.id,
+          amount: totalPrice,
+        });
+  
+        if (transactionResponse.ok) {
+          setTicketSuccess('Ticket and transaction created successfully!');
+          // Handle further actions after successful ticket creation
+        } else {
+          setTicketError('Failed to create transaction');
+        }
       } else {
         setTicketError(result?.message || 'Failed to create ticket');
       }
