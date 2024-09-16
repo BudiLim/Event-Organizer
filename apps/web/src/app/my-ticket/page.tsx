@@ -5,6 +5,7 @@ import { DecodedToken, TicketDetails } from '@/type/user';
 import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import moment from 'moment';
 
 const MyTicket = () => {
   const [data, setData] = useState<TicketDetails | null>(null);
@@ -48,6 +49,16 @@ const MyTicket = () => {
   // Function ganti angka harga
   const formatPrice = (price: number) => {
     return `Rp. ${new Intl.NumberFormat('id-ID').format(price)}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    return moment(dateString).format('DD MMM YYYY'); // Formats the date
+  };
+  const formatTime24Hour = (dateString: string) => {
+    const date = new Date(dateString);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   return (
@@ -108,11 +119,11 @@ const MyTicket = () => {
                       {ticket.event.location}
                     </td>
                     <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(ticket.event.eventDate).toLocaleDateString()} /{' '}
-                      {new Date(ticket.event.eventTime).toLocaleTimeString()}
+                    {formatDate(ticket.event.eventDate)} /{' '}
+                    {formatTime24Hour(ticket.event.eventDate)}
                     </td>
                     <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(ticket.purchaseDate).toLocaleDateString()}
+                    {formatDate(ticket.purchaseDate)}
                     </td>
                     <td className="px-2 md:px-4 py-2 md:py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatPrice(ticket.price)}

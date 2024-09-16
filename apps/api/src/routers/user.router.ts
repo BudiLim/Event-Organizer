@@ -1,5 +1,5 @@
 import { UserController } from '@/controllers/user.controller';
-import { checkRole, verifyToken } from '@/middlewares/token';
+import { checkExperience, checkOrganizer, verifyToken } from '@/middlewares/token';
 import { validateRegister } from '@/middlewares/validator';
 import { Router } from 'express';
 

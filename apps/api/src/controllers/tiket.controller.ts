@@ -68,7 +68,7 @@ export class TicketController {
     }
   }
 
-  async getTicketByUserIdAndTicketId(req: Request, res: Response) {
+  async getTicketId(req: Request, res: Response) {
     const userId = parseInt(req.params.userId, 10);
     const ticketId = parseInt(req.params.id, 10);
 
