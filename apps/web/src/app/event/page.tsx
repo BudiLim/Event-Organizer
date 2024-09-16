@@ -1,5 +1,7 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 // Define the Event type
 interface Event {
@@ -26,8 +28,9 @@ const Event = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/create-event');
-        
+        // Adjust the endpoint URL based on your API setup
+        const response = await fetch('http://localhost:8000/api/event'); 
+
         // Check if response is okay
         if (!response.ok) {
           throw new Error('Failed to fetch events');
@@ -35,12 +38,12 @@ const Event = () => {
 
         const data = await response.json();
 
-        // Ensure data.events exists and is an array
-        if (!data.events || !Array.isArray(data.events)) {
+        // Ensure data.event exists and is an array
+        if (!data.event || !Array.isArray(data.event)) {
           throw new Error('Invalid events data');
         }
 
-        setEvents(data.events); // Set the events state
+        setEvents(data.event); // Set the events state
         setLoading(false);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -52,9 +55,6 @@ const Event = () => {
     fetchEvents();
   }, []);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
 
   if (error) {
     return <div className="text-red-500 text-center">{error}</div>;
@@ -69,28 +69,19 @@ const Event = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
             <div key={event.id} className="bg-white shadow-md rounded-lg p-6">
-              <img
-                src={event.image}
-                alt={event.name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
-              <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
-              <p className="text-gray-700 mb-2">{event.description}</p>
-              <p className="text-gray-600">
-                <span className="font-semibold">Location:</span> {event.location}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-semibold">Date:</span> {new Date(event.date).toLocaleDateString()}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-semibold">Time:</span> {new Date(event.time).toLocaleTimeString()}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-semibold">Available Seats:</span> {event.availableSeats}
-              </p>
-              <p className={`mt-4 ${event.isPaidEvent === 'Paid' ? 'text-red-500' : 'text-green-500'}`}>
-                {event.isPaidEvent === 'Paid' ? 'Paid Event' : 'Free Event'}
-              </p>
+              <Link href={`/event/${event.id}`}>
+            
+                  <Image
+                    src={event.image}
+                    alt={event.name}
+                    width={450}
+                    height={300}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                  <h2 className="text-xl font-semibold mb-2">{event.name}</h2>
+             
+              </Link>
+              {/* Other event details */}
             </div>
           ))}
         </div>

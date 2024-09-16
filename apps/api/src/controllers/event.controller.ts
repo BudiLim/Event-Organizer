@@ -8,11 +8,13 @@ interface MulterRequest extends Request {
 }
 
 export class EventController {
+  // Metode lainnya...
+
   async createEvent(req: MulterRequest, res: Response) {
     try {
-      if (!req.file) throw new Error('no file uploaded'); // Lebih baik gunakan Error object
+      if (!req.file) throw new Error('No file uploaded'); // Lebih baik gunakan Error object
 
-      const link = `http://localhost:8000/api/public/event/${req?.file?.filename}`;
+      const link = `http://localhost:8000/api/public/event/${req.file.filename}`;
 
       const {
         name,
@@ -24,41 +26,50 @@ export class EventController {
         organizerId,
         eventDate,
         eventTime, // Mengelola waktu terpisah
-        sellEndDate, // Tanggal berakhir penjualan (tambahkan di request body)
-        sellEndTime, // Waktu berakhir penjualan (tambahkan di request body)
+        sellEndDate, // Tanggal berakhir penjualan
+        sellEndTime, // Waktu berakhir penjualan
       } = req.body;
 
       const eventDateTime = new Date(`${eventDate}T${eventTime}`);
       const sellEndDateTime = new Date(`${sellEndDate}T${sellEndTime}`);
 
+      if (isPaidEvent === 'Paid' && (!price || isNaN(parseFloat(price)))) {
+        throw new Error('Price must be provided for Paid events');
+      }
 
+      const eventData: Prisma.EventCreateInput = {
+        name,
+        location,
+        description,
+        isPaidEvent, 
+        availableSeats: parseInt(availableSeats),
+        eventDate: new Date(eventDate), 
+        eventTime: eventDateTime,
+        sellEndDate: new Date(sellEndDate), 
+        sellEndTime: sellEndDateTime, 
+        image: link,
+        organizer: { connect: { id: parseInt(organizerId, 10) } },
+      };
+
+      if (isPaidEvent === 'Paid') {
+        eventData.price = parseFloat(price);
+      } else {
+        eventData.price = 0;
+      }
 
       const event = await prisma.event.create({
-        data: {
-          name,
-          price: parseFloat(price),
-          location,
-          description,
-          isPaidEvent, 
-          availableSeats: parseInt(availableSeats, 10),
-          eventDate: new Date(eventDate), // Tetap sebagai tanggal
-          eventTime: eventDateTime, // Waktu khusus event
-          sellEndDate: new Date(sellEndDate), // Tetap sebagai tanggal untuk akhir penjualan
-          sellEndTime: sellEndDateTime, // Waktu untuk akhir penjualan
-          image: link,
-          organizerId: parseInt(organizerId, 10),
-        },
+        data: eventData
       });
 
-      res.status(201).json(event);
+      res.status(201).json({ event });
     } catch (err) {
-      res.status(400).send({
-        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
       });
     }
   }
 
-  async getEvent(req: MulterRequest, res: Response) {
+  async getEvent(req: Request, res: Response) {
     try {
       const { search } = req.query;
       let filter: Prisma.EventWhereInput = {};
@@ -66,18 +77,43 @@ export class EventController {
       if (search) {
         filter.name = { contains: search as string };
       }
-      const event = await prisma.event.findMany({
+      const events = await prisma.event.findMany({
         where: filter,
         include: { organizer: true },
         orderBy: { createdAt: 'desc' },
       });
-      res.status(200).send({
+      res.status(200).json({
         status: 'ok',
-        event,
+        event: events,
       });
     } catch (err) {
-      res.status(400).send({
-        msg: err instanceof Error ? err.message : err, // Menangani error dengan lebih baik
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
+      });
+    }
+  }
+
+  async getEventById(req: Request, res: Response) {
+    try {
+      const { id } = req.params; // Ambil ID dari parameter URL
+
+      if (!id || isNaN(Number(id))) {
+        return res.status(400).json({ msg: 'Invalid event ID' });
+      }
+
+      const event = await prisma.event.findUnique({
+        where: { id: Number(id) },
+        include: { organizer: true }, // Sertakan informasi organizer jika diperlukan
+      });
+
+      if (!event) {
+        return res.status(404).json({ msg: 'Event not found' });
+      }
+
+      res.status(200).json({ event });
+    } catch (err) {
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
       });
     }
   }
