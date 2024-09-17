@@ -5,7 +5,7 @@ import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 import { useParams } from 'next/navigation';
 import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
-import { toast } from 'react-toastify';
+import { createTransaction } from '@/lib/transaction';
 
 interface Event {
   id: number;
@@ -79,19 +79,19 @@ const DetailEvent = () => {
 
   const applyDiscount = async () => {
     if (!discountCode) return;
-  
+
     try {
       const response = await fetch(
-        `http://localhost:8000/api/promotion`,
+        `http://localhost:8000/api/promotion/apply`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ discountCode, eventId: event?.id }),
-        }
+        },
       );
-  
+
       const result = await response.json();
       if (response.ok && result.discount) {
         setDiscountAmount(result.discount.amount);
@@ -105,7 +105,6 @@ const DetailEvent = () => {
       setIsDiscountValid(false);
     }
   };
-  
 
   const handleTicketCreation = async () => {
     if (!event) return;
@@ -130,13 +129,24 @@ const DetailEvent = () => {
       );
 
       if (ok) {
-        toast.success('Ticket created successfully!');
-        // Handle further actions after successful ticket creation
+        // Create a transaction after successfully creating a ticket
+        const transactionResponse = await createTransaction({
+          userId: 1, // Replace with the actual user ID
+          eventId: event.id,
+          amount: totalPrice,
+        });
+
+        if (transactionResponse.ok) {
+          setTicketSuccess('Ticket and transaction created successfully!');
+          // Handle further actions after successful ticket creation
+        } else {
+          setTicketError('Failed to create transaction');
+        }
       } else {
-        toast.error(result?.message || 'Failed to create ticket');
+        setTicketError(result?.message || 'Failed to create ticket');
       }
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      setTicketError('An unexpected error occurred');
     } finally {
       setIsCreatingTicket(false);
     }

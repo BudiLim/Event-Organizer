@@ -142,7 +142,7 @@ const Dashboard = () => {
         <h2 className="text-lg font-bold mb-4">Report Statistics</h2>
         {/* Chart component will go here in future */}
         <div className="h-64 bg-gray-200 flex items-center justify-center">
-          <p className="text-gray-600">Chart will go here</p>
+          <p className="text-gray-600">Chart still on progress</p>
         </div>
       </div>
 

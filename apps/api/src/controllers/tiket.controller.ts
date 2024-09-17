@@ -1,3 +1,4 @@
+import { TicketService } from '@/middlewares/ticket.service';
 import prisma from '@/prisma';
 import { Request, Response } from 'express';
 
@@ -109,6 +110,49 @@ export class TicketController {
       return res.status(500).json({
         status: 'error',
         message: 'Unable to fetch ticket details',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  async createTicket(req: Request, res: Response) {
+    const { eventId, quantity, paymentMethod, price, discountCode } = req.body;
+    const userId = req.user?.id; // Ensure that req.user is not undefined
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+
+    try {
+      const ticket = await TicketService.purchaseTicket({
+        userId,
+        eventId,
+        quantity,
+        price,
+        discountCode,
+      });
+
+      // Calculate the total amount based on ticket price, quantity, and discount (if any)
+      const totalAmount = price * quantity; // Add your discount logic if necessary
+
+      // Create the transaction after the ticket is created
+      const transaction = await prisma.transaction.create({
+        data: {
+          userId,
+          eventId,
+          amount: totalAmount,
+        },
+      });
+
+      return res.status(201).json({
+        status: 'success',
+        ticket,
+      });
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      return res.status(400).json({
+        status: 'error',
+        message: 'Ticket creation failed',
         details: error instanceof Error ? error.message : String(error),
       });
     }
