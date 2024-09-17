@@ -48,7 +48,7 @@ const Navbar = () => {
     console.log('user:', user)
   }, []);
 
-  
+
 
   return (
     <div className="fixed flex justify-between top-0 z-10 h-[60px] w-full px-[20px] lg:px-[40px] bg-black bg-opacity-70">
@@ -77,6 +77,7 @@ const Navbar = () => {
         <SearchInput />
 
         {/* Category dropdown */}
+        {checkRole(Role.Experience) &&
         <div className="flex items-center">
           <div className="dropdown dropdown-hover">
             <div tabIndex={1} role="button" className="bg-transparent font-semibold text-[15px] text-white hover:scale-105">
@@ -89,11 +90,21 @@ const Navbar = () => {
             </ul>
           </div>
         </div>
+        }
+
+        {checkRole(Role.Organizer) &&
+        <Link href={'/create-event'}>
+          Create Event
+        </Link>
+        }
 
         {user.id ? (
           <div>
             {checkRole(Role.Organizer) &&
-              <div className="dropdown dropdown-end text-black">
+              <div className="dropdown dropdown-end text-white">
+                <div>
+                  <h1><Link href={'/create-event'}>Create Event</Link></h1>
+                </div>
                 <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white bg-zinc-900 text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
                 <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-44 p-2 shadow">
                   <li><Link href={'/create-event'}>Create Event</Link></li>
@@ -104,19 +115,20 @@ const Navbar = () => {
               </div>}
 
 
-            {checkRole(Role.Experience) && <div className="dropdown dropdown-end">
-              <div className="flex items-center gap-[30px]">
-                <h1 className="flex items-center gap-1 text-white font-bold text-[15px]"><Image src={coin} alt="coin" width={30} />{user.points}</h1>
-                <div>
-                  <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white  bg-zinc-900  text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
-                  <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                    <li><Link href={'/my-ticket'}>My Ticket</Link></li>
-                    <li><Link href={'/account-settings'}>Account Setting</Link></li>
-                    <li><Link onClick={onLogout} href={'/'}>log Out</Link></li>
-                  </ul>
+            {checkRole(Role.Experience) &&
+              <div className="dropdown dropdown-end">
+                <div className="flex items-center gap-[30px]">
+                  <h1 className="flex items-center gap-1 text-white font-bold text-[15px]"><Image src={coin} alt="coin" width={30} />{user.points}</h1>
+                  <div>
+                    <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white  bg-zinc-900  text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
+                    <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                      <li><Link href={'/my-ticket'}>My Ticket</Link></li>
+                      <li><Link href={'/account-settings'}>Account Setting</Link></li>
+                      <li><Link onClick={onLogout} href={'/'}>log Out</Link></li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            </div>}
+              </div>}
 
           </div>
         ) : (
@@ -132,25 +144,25 @@ const Navbar = () => {
           <FiX size={30} color="white" onClick={toggleSidebar} />
         </div>
         <div className="flex flex-col p-4">
-          {checkRole(Role.Organizer) && 
-          <div className="flex flex-col gap-1 ">
-            <h1 className="flex gap-3  items-center font-semibold text-white text-[20px] mb-4"><FiUser/>{user.firstName + ' ' + user.lastName}</h1>
-            <Link href="/my-event" className="font-semibold text-white text-[15px] mb-4">My event</Link>
-            <Link href="/dashboard" className="font-semibold text-white text-[15px] mb-4">DashBoard</Link>
-            <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
-            <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account setting</Link>
-            <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
-          </div>
+          {checkRole(Role.Organizer) &&
+            <div className="flex flex-col gap-1 ">
+              <h1 className="flex gap-3  items-center font-semibold text-white text-[20px] mb-4"><FiUser />{user.firstName + ' ' + user.lastName}</h1>
+              <Link href="/my-event" className="font-semibold text-white text-[15px] mb-4">My event</Link>
+              <Link href="/dashboard" className="font-semibold text-white text-[15px] mb-4">DashBoard</Link>
+              <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
+              <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account setting</Link>
+              <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
+            </div>
           }
-          {checkRole(Role.Experience) && 
-          <div className="flex flex-col gap-1">
-            <h1 className="flex gap-3 items-center font-semibold text-white text-[20px] mb-4"><FiUser/>{user.firstName + ' ' + user.lastName}</h1>
-            <h1 className="flex items-center gap-2 pb-3 text-white font-medium"><Image src={coin} alt="coin" width={25} />{user.points}</h1>
-            <Link href="/my-ticket" className="font-semibold text-white text-[15px] mb-4">My Ticket</Link>
-            <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
-            <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account Setting</Link>
-            <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
-          </div>
+          {checkRole(Role.Experience) &&
+            <div className="flex flex-col gap-1">
+              <h1 className="flex gap-3 items-center font-semibold text-white text-[20px] mb-4"><FiUser />{user.firstName + ' ' + user.lastName}</h1>
+              <h1 className="flex items-center gap-2 pb-3 text-white font-medium"><Image src={coin} alt="coin" width={25} />{user.points}</h1>
+              <Link href="/my-ticket" className="font-semibold text-white text-[15px] mb-4">My Ticket</Link>
+              <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
+              <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account Setting</Link>
+              <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
+            </div>
           }
         </div>
       </div>

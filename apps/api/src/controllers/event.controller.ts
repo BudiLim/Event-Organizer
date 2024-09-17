@@ -25,9 +25,15 @@ export class EventController {
         availableSeats,
         organizerId,
         eventDate,
-        eventTime, // Mengelola waktu terpisah
-        sellEndDate, // Tanggal berakhir penjualan
-        sellEndTime, // Waktu berakhir penjualan
+        eventTime,
+        sellEndDate, 
+        sellEndTime,
+        discountCode,
+        amount,
+        quotaAvailable,
+        quotaUsed,
+        validUntil,
+        category
       } = req.body;
 
       const eventDateTime = new Date(`${eventDate}T${eventTime}`);
@@ -37,17 +43,23 @@ export class EventController {
         throw new Error('Price must be provided for Paid events');
       }
 
+      const validCategories = ['SINGLEBAND', 'GROUPBAND', 'DISC_JORKEY'];
+      if (!validCategories.includes(category)) {
+        throw new Error ('invalid category')
+      }
+
       const eventData: Prisma.EventCreateInput = {
         name,
         location,
         description,
-        isPaidEvent, 
+        isPaidEvent: isPaidEvent === 'Paid' ? 'Paid' : 'Free', 
         availableSeats: parseInt(availableSeats),
         eventDate: new Date(eventDate), 
         eventTime: eventDateTime,
         sellEndDate: new Date(sellEndDate), 
         sellEndTime: sellEndDateTime, 
         image: link,
+        category: category,
         organizer: { connect: { id: parseInt(organizerId, 10) } },
       };
 
@@ -60,6 +72,20 @@ export class EventController {
       const event = await prisma.event.create({
         data: eventData
       });
+
+      if (discountCode && amount && quotaAvailable && validUntil) {
+        const promotionData: Prisma.PromotionCreateInput = {
+          event: { connect: { id: event.id } },
+          discountCode,
+          amount: parseFloat(amount),
+          quotaAvailable,
+          quotaUsed: quotaUsed || "0",
+          validUntil: new Date(validUntil)
+        };
+        await prisma.promotion.create({
+          data: promotionData,
+        })
+      }
 
       res.status(201).json({ event });
     } catch (err) {

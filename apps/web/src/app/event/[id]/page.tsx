@@ -144,9 +144,9 @@ const DetailEvent = () => {
   };
 
   return (
-    <div className="flex justify-center items-center m-8">
-      <div className="flex bg-black p-8 rounded-lg gap-[80px]">
-        <div className="shadow-sm shadow-white rounded-lg">
+    <div className='flex justify-center items-center  w-full h-min-screen'>
+      <div className='flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4'>
+        <div className='shadow-sm shadow-white rounded-lg'>
           {event.image ? (
             <Image
               src={event.image}
