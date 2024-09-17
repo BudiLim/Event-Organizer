@@ -8,17 +8,27 @@ export class PromotionController {
     this.promotionService = new PromotionService();
   }
 
+  // Apply a discount based on a discount code and event ID
   async applyDiscount(req: Request, res: Response): Promise<void> {
     const { discountCode, eventId } = req.body;
 
+    // Validate the inputs
+    if (!discountCode || !eventId) {
+      res.status(400).json({ message: 'Invalid discount code or event ID' });
+      return;
+    }
+
     try {
-      // Validate and apply discount using a service method
+      // Fetch the discount using the service
       const discount = await this.promotionService.applyDiscount(discountCode, eventId);
 
       if (discount) {
-        res.json({ discount });
+        res.status(200).json({
+          message: 'Discount applied successfully',
+          discountAmount: discount.amount,
+        });
       } else {
-        res.status(400).json({ message: 'Invalid discount code' });
+        res.status(400).json({ message: 'Invalid or expired discount code' });
       }
     } catch (error) {
       console.error('Error applying discount:', error);

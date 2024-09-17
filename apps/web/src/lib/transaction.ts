@@ -1,3 +1,6 @@
+
+// SUDAH TIDAK TERPAKAI
+
 const base_url = process.env.BASE_URL_API || 'http://localhost:8000/api';
 
 export const createTransaction = async (transactionData: {
@@ -15,7 +18,7 @@ export const createTransaction = async (transactionData: {
     });
 
     if (!response.ok) {
-      const errorText = await response.text(); // Get detailed error message
+      const errorText = await response.text();
       return { ok: false, message: errorText };
     }
 

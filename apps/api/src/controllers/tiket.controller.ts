@@ -116,7 +116,7 @@ export class TicketController {
   }
 
   async createTicket(req: Request, res: Response) {
-    const { eventId, quantity, paymentMethod, discountCode } = req.body;
+    const { eventId, quantity, paymentMethod, price, discountCode } = req.body;
     const userId = req.user?.id; // Ensure that req.user is not undefined
 
     if (!userId) {
@@ -128,7 +128,20 @@ export class TicketController {
         userId,
         eventId,
         quantity,
+        price,
         discountCode,
+      });
+
+      // Calculate the total amount based on ticket price, quantity, and discount (if any)
+      const totalAmount = price * quantity; // Add your discount logic if necessary
+
+      // Create the transaction after the ticket is created
+      const transaction = await prisma.transaction.create({
+        data: {
+          userId,
+          eventId,
+          amount: totalAmount,
+        },
       });
 
       return res.status(201).json({
@@ -144,5 +157,4 @@ export class TicketController {
       });
     }
   }
-  
 }

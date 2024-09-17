@@ -46,6 +46,7 @@ export const createTicket = async (
   eventId: number,
   price: number, 
   quantity: number,
+  totalAmount: number,
   discountCode?: string
 ) => {
   try {
@@ -62,6 +63,7 @@ export const createTicket = async (
         quantity,
         price,
         discountCode,
+        amount: totalAmount,
       }),
     });
 
@@ -76,3 +78,32 @@ export const createTicket = async (
     return { result: null, ok: false, error: error };
   }
 };
+
+export const applyDiscount = async (discountCode: string, eventId: number) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${base_url}/apply-discount`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        discountCode,
+        eventId,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to apply discount');
+    }
+
+    return { ok: true, result };
+  } catch (error) {
+    console.error('Error applying discount:', error);
+    return { ok: false, error: error };
+  }
+};
+

@@ -1,3 +1,4 @@
+// SUDAH TIDAK TERPAKAI
 import { Request, Response } from 'express';
 import prisma from '@/prisma'; // Ensure this is the correct path
 
@@ -25,3 +26,5 @@ export class TransactionController {
     }
   }
 }
+
+// SUDAH TIDAK TERPAKAI

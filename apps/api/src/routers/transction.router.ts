@@ -1,3 +1,4 @@
+// SUDAH TIDAK TERPAKAI
 import { Router } from 'express';
 import { verifyToken } from '@/middlewares/token';
 import { TransactionController } from '@/controllers/transaction.controller';
@@ -13,10 +14,16 @@ export class TransactionRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/transaction/create', verifyToken, this.transactionController.createTransaction);
+    this.router.post(
+      '/transaction/create',
+      verifyToken,
+      this.transactionController.createTransaction,
+    );
   }
 
   getRouter(): Router {
     return this.router;
   }
 }
+
+// SUDAH TIDAK TERPAKAI

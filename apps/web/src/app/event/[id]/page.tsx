@@ -1,10 +1,11 @@
-"use client"
+'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 import { useParams } from 'next/navigation';
 import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
+import { toast } from 'react-toastify';
 
 interface Event {
   id: number;
@@ -27,7 +28,7 @@ interface Event {
 
 const DetailEvent = () => {
   const { id } = useParams();
-  
+
   const [event, setEvent] = useState<Event | null>(null);
   const [ticketCount, setTicketCount] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -60,11 +61,11 @@ const DetailEvent = () => {
   }, [id]);
 
   const plusCount = () => {
-    if (ticketCount < 100) setTicketCount(prev => prev + 1);
+    if (ticketCount < 100) setTicketCount((prev) => prev + 1);
   };
 
   const minusCount = () => {
-    if (ticketCount > 1) setTicketCount(prev => prev - 1);
+    if (ticketCount > 1) setTicketCount((prev) => prev - 1);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,16 +79,19 @@ const DetailEvent = () => {
 
   const applyDiscount = async () => {
     if (!discountCode) return;
-
+  
     try {
-      const response = await fetch(`http://localhost:8000/api/promotion/apply`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ discountCode, eventId: event?.id }),
-      });
-      
+      const response = await fetch(
+        `http://localhost:8000/api/promotion`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ discountCode, eventId: event?.id }),
+        }
+      );
+  
       const result = await response.json();
       if (response.ok && result.discount) {
         setDiscountAmount(result.discount.amount);
@@ -101,41 +105,48 @@ const DetailEvent = () => {
       setIsDiscountValid(false);
     }
   };
+  
 
   const handleTicketCreation = async () => {
     if (!event) return;
-  
+
+    const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
+    const totalAmount = ticketPrice * ticketCount - discountAmount; // Calculate total amount
+
+    // Ensure totalAmount isn't negative (if discount is greater than ticket price)
+    const finalAmount = totalAmount < 0 ? 0 : totalAmount;
+
     setIsCreatingTicket(true);
     setTicketError(null);
     setTicketSuccess(null);
-  
+
     try {
       const { result, ok } = await createTicket(
         event.id,
         ticketPrice,
         ticketCount,
-        discountCode
+        finalAmount,
+        discountCode,
       );
-  
+
       if (ok) {
-        setTicketSuccess('Ticket created successfully!');
+        toast.success('Ticket created successfully!');
         // Handle further actions after successful ticket creation
       } else {
-        setTicketError(result?.message || 'Failed to create ticket');
+        toast.error(result?.message || 'Failed to create ticket');
       }
     } catch (error) {
-      setTicketError('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     } finally {
       setIsCreatingTicket(false);
     }
   };
-  
 
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
-  const totalPrice = (ticketPrice * ticketCount) - discountAmount;
+  const totalPrice = ticketPrice * ticketCount - discountAmount;
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <div className='text-red-500 text-center'>{error}</div>;
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
   if (!event) return <p>No event data</p>;
 
   const formatDate = (dateString: string) => {
@@ -149,37 +160,48 @@ const DetailEvent = () => {
   };
 
   return (
-    <div className='flex justify-center items-center m-8'>
-      <div className='flex bg-black p-8 rounded-lg gap-[80px]'>
-        <div className='shadow-sm shadow-white rounded-lg'>
+    <div className="flex justify-center items-center m-8">
+      <div className="flex bg-black p-8 rounded-lg gap-[80px]">
+        <div className="shadow-sm shadow-white rounded-lg">
           {event.image ? (
-            <Image src={event.image} alt='Event Image' width={450} height={300} />
+            <Image
+              src={event.image}
+              alt="Event Image"
+              width={450}
+              height={300}
+            />
           ) : (
-            <div className='w-450 h-300 bg-gray-500 flex items-center justify-center text-white'>
+            <div className="w-450 h-300 bg-gray-500 flex items-center justify-center text-white">
               No Image Available
             </div>
           )}
         </div>
-        <div className='flex flex-col justify-between text-white gap-4'>
-          <div className='flex flex-col gap-4'>
-            <h1 className='text-3xl font-bold'>{event.name}</h1>
-            <div className='text-extrathin text-lg'>
-              <h1 className='font-semibold'>Date & Time</h1>
-              <p className='text-[#d9d9d9]'>{formatDate(event.eventDate) || 'No date available'} | {formatTime24Hour(event.eventDate)}</p>
+        <div className="flex flex-col justify-between text-white gap-4">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-3xl font-bold">{event.name}</h1>
+            <div className="text-extrathin text-lg">
+              <h1 className="font-semibold">Date & Time</h1>
+              <p className="text-[#d9d9d9]">
+                {formatDate(event.eventDate) || 'No date available'} |{' '}
+                {formatTime24Hour(event.eventDate)}
+              </p>
             </div>
-            <div className='text-extrathin text-lg'>
-              <h1 className='font-semibold'>Location</h1>
-              <p className='text-[#d9d9d9]'>{event.location}</p>
+            <div className="text-extrathin text-lg">
+              <h1 className="font-semibold">Location</h1>
+              <p className="text-[#d9d9d9]">{event.location}</p>
             </div>
-            <div className='text-extrathin text-lg'>
-              <h1 className='font-semibold'>Organized By</h1>
-              <p className='text-[#d9d9d9]'>{event.organizer.name}</p>
+            <div className="text-extrathin text-lg">
+              <h1 className="font-semibold">Organized By</h1>
+              <p className="text-[#d9d9d9]">{event.organizer.name}</p>
             </div>
-            <div className='text-extrathin text-lg'>
-              <h1 className='font-semibold'>General Admission</h1>
-              <div className='flex justify-between w-full'>
-                <h1>Rp. {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-</h1>
-                <div className='flex items-center gap-3'>
+            <div className="text-extrathin text-lg">
+              <h1 className="font-semibold">General Admission</h1>
+              <div className="flex justify-between w-full">
+                <h1>
+                  Rp.{' '}
+                  {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
+                </h1>
+                <div className="flex items-center gap-3">
                   <FiMinusCircle onClick={minusCount} size={26} />
                   <input
                     type="number"
@@ -191,37 +213,40 @@ const DetailEvent = () => {
                 </div>
               </div>
             </div>
-            <div className='flex flex-col gap-2 text-white font-normal'>
+            <div className="flex flex-col gap-2 text-white font-normal">
               <h1>Discount Voucher</h1>
               <input
                 type="text"
-                placeholder='Discount Code Here . . .'
+                placeholder="Discount Code Here . . ."
                 value={discountCode}
                 onChange={handleDiscountChange}
-                className='input input-bordered bg-slate-800'
+                className="input input-bordered bg-slate-800"
               />
               <button
                 onClick={applyDiscount}
-                className='bg-blue-700 p-2 rounded-lg mt-2'
+                className="bg-blue-700 p-2 rounded-lg mt-2"
               >
                 Apply Discount
               </button>
               {isDiscountValid === false && (
-                <p className='text-red-500'>Invalid Discount Code</p>
+                <p className="text-red-500">Invalid Discount Code</p>
               )}
             </div>
           </div>
-          <div className='flex justify-between items-center'>
-            <h1 className='font-bold'>Total: Rp. {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="font-bold">
+              Total: Rp.{' '}
+              {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
+            </h1>
             <button
               onClick={handleTicketCreation}
               disabled={isCreatingTicket}
-              className='bg-blue-700 p-2 rounded-lg'
+              className="bg-blue-700 p-2 rounded-lg"
             >
               {isCreatingTicket ? 'Processing...' : 'Check Out'}
             </button>
-            {ticketError && <p className='text-red-500'>{ticketError}</p>}
-            {ticketSuccess && <p className='text-green-500'>{ticketSuccess}</p>}
+            {ticketError && <p className="text-red-500">{ticketError}</p>}
+            {ticketSuccess && <p className="text-green-500">{ticketSuccess}</p>}
           </div>
         </div>
       </div>

@@ -30,11 +30,13 @@ export class TicketService {
     userId,
     eventId,
     quantity,
+    price,
     discountCode,
   }: {
     userId: number;
     eventId: number;
     quantity: number;
+    price: number;
     discountCode?: string;
   }) {
     let discountAmount = 0;

@@ -14,6 +14,7 @@ export class PromotionRouter {
 
   private initializeRoutes(): void {
     this.router.post('/apply', verifyToken, this.promotionController.applyDiscount);
+    this.router.post('/apply-discount', verifyToken, this.promotionController.applyDiscount.bind(this.promotionController));
   }
 
   getRouter(): Router {
