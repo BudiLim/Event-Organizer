@@ -42,17 +42,21 @@ export interface IUserState {
 
 export interface Event {
   id: number;
-  image: string;
   name: string;
+  description: string;
   location: string;
   eventDate: string;
   eventTime: string;
   sellEndDate: string;
   sellEndTime: string;
-  isPaidEvent: boolean;
   price: number;
+  image?: string;
   availableSeats: number;
-  ticket: Ticket;
+  isPaidEvent: string;
+  organizer: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface DashboardData {

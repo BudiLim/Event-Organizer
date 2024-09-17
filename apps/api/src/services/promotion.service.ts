@@ -7,26 +7,28 @@ export class PromotionService {
     discountCode: string,
     eventId: number,
   ): Promise<{ amount: number } | null> {
+    console.log(`Applying discount: ${discountCode} for event ${eventId}`);
+    
     // Validate the discount code
     const promotion = await this.validateDiscountCode(discountCode, eventId);
-
+    console.log('Promotion:', promotion);
+  
     if (promotion) {
-      // Check if the promotion is valid
       if (this.isPromotionValid(promotion)) {
-        // Check if the quota is available
         if (this.isQuotaAvailable(promotion)) {
-          // Optionally mark the promotion as used if quota is used
           await this.updateQuota(promotion.id);
-
           return { amount: promotion.amount };
         } else {
-          return null; // No quota available
+          console.log('No quota available');
+          return null;
         }
       } else {
-        return null; // Promotion is not valid
+        console.log('Promotion not valid');
+        return null;
       }
     } else {
-      return null; // Promotion not found
+      console.log('Promotion not found');
+      return null;
     }
   }
 
