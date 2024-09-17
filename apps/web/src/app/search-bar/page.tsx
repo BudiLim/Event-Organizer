@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { getEvent } from "@/lib/event";
+import { useEffect, useRef, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useDebounce } from "use-debounce";
 
@@ -7,12 +8,28 @@ const SearchInput = () => {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const [search, setSearch] = useState<string>('');
   const [value] = useDebounce(search, 1000);
+  const [data, setData] = useState([])
+
 
   const handleChange = () => {
     if (searchRef.current) {
       setSearch(searchRef.current.value);
     }
   };
+
+  const getData = async () => {
+    try {
+      const { event } = await getEvent(value)
+      setData(event)
+      console.log(event)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+  }, [value])
 
   return (
     <div>
@@ -28,9 +45,10 @@ const SearchInput = () => {
           className="text-white absolute top-1/2 left-2 transform -translate-y-1/2 z-10"
           size={16}
         />
+        <div>
+          {value}
+        </div>
       </div>
-      
-    
     </div>
   );
 };

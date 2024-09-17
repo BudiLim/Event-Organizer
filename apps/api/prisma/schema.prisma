@@ -43,6 +43,12 @@ enum IsPaidEvent {
   Paid
 }
 
+enum Category {
+  SINGLEBAND
+  GROUPBAND
+  DISC_JORKEY
+}
+
 model Event {
   id             Int         @id @default(autoincrement())
   organizerId    Int
@@ -57,6 +63,7 @@ model Event {
   image          String
   availableSeats Int
   isPaidEvent    IsPaidEvent
+  category       Category
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 

@@ -32,7 +32,8 @@ export class EventController {
         amount,
         quotaAvailable,
         quotaUsed,
-        validUntil
+        validUntil,
+        category
       } = req.body;
 
       const eventDateTime = new Date(`${eventDate}T${eventTime}`);
@@ -42,17 +43,23 @@ export class EventController {
         throw new Error('Price must be provided for Paid events');
       }
 
+      const validCategories = ['SINGLEBAND', 'GROUPBAND', 'DISC_JORKEY'];
+      if (!validCategories.includes(category)) {
+        throw new Error ('invalid category')
+      }
+
       const eventData: Prisma.EventCreateInput = {
         name,
         location,
         description,
-        isPaidEvent, 
+        isPaidEvent: isPaidEvent === 'Paid' ? 'Paid' : 'Free', 
         availableSeats: parseInt(availableSeats),
         eventDate: new Date(eventDate), 
         eventTime: eventDateTime,
         sellEndDate: new Date(sellEndDate), 
         sellEndTime: sellEndDateTime, 
         image: link,
+        category: category,
         organizer: { connect: { id: parseInt(organizerId, 10) } },
       };
 

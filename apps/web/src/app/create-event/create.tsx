@@ -1,118 +1,237 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import afgan from '@/assets/afgan.png';
+// 'use client'
+// import { useState } from "react";
 
-export default function CretaeEvents() {
-  return (
-    <section className="relative w-full flex justify-center items-center py-10 px-5">
-      <div className="w-full max-w-3xl bg-white shadow-xl rounded-lg p-8">
-        <h1 className="text-3xl font-semibold text-center mb-6">
-          Create Your Event
-        </h1>
-        <div className="border-t border-gray-300 mb-6"></div>
+// const EventForm = () => {
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     date: '',
+//     time: '',
+//     location: '',
+//     description: '',
+//     availableSeats: '',
+//     isPaidEvent: 'Free',
+//     price: '',
+//     sellEndDate: '',
+//     sellEndTime: '',
+//     discountCode: '',
+//     amount: '',
+//     quotaAvailable: '',
+//     validUntil: ''
+//   });
 
-        <div className="flex flex-col md:flex-row md:items-start">
-          <div className="md:w-1/3 flex justify-center md:justify-start mb-6 md:mb-0">
-            <div className="relative w-[300px] h-[400px]">
-              <Image
-                src={afgan}
-                alt="afgan"
-                layout="fill"
-                className="object-cover rounded-md"
-              />
-            </div>
-          </div>
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+//     setFormData({
+//       ...formData,
+//       [e.target.name]: e.target.value
+//     });
+//   };
 
-          {/* Ticket Information Section */}
-          <div className="md:w-2/3 md:pl-8">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold">Event Name</h2>
-              <input
-                type="text"
-                placeholder="Afgan Comeback"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
-            </div>
+//   const handleSubmit = async (e) => {
+//   e.preventDefault();
 
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold">Location</h2>
-              <input
-                type="text"
-                placeholder="Jakarta"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
-            </div>
+//   try {
+//     const response = await fetch('http://localhost:8000/api/create-event', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(formData),
+//     });
 
-            <div className="mb-4 flex space-x-4">
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold"> Event Date</h2>
-                <input
-                  type="date"
-                  placeholder="10 Sep 2024"
-                  className="input input-bordered input-sm w-full max-w-xs"
-                />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold">Time</h2>
-                <input
-                  type="time"
-                  placeholder="19:00 WIB"
-                  className="input input-bordered input-sm w-full max-w-xs"
-                />
-              </div>
-            </div>
+//     const data = await response.json();
+//     if (response.ok) {
+//       alert('Event created successfully!');
+//     } else {
+//       console.log('Error:', data);
+//       alert(`Error: ${data.message}`);
+//     }
+//   } catch (error) {
+//     console.error('Error submitting form:', error);
+//     alert('An error occurred while creating the event');
+//   }
+// };
 
-            <div className="mb-4 flex space-x-4">
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold"> Selling End at</h2>
-                <input
-                  type="date"
-                  placeholder="10 Sep 2024"
-                  className="input input-bordered input-sm w-full max-w-xs"
-                />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold">Time</h2>
-                <input
-                  type="time"
-                  placeholder="19:00 WIB"
-                  className="input input-bordered input-sm w-full max-w-xs"
-                />
-              </div>
-            </div>
+//   return (
+//     <form onSubmit={handleSubmit} className="space-y-4">
+//       {/* Event Name */}
+//       <div>
+//         <label className="block text-slate-300">Event Name</label>
+//         <input
+//           type="text"
+//           name="name"
+//           value={formData.name}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
 
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold">Total Seat Capacity</h2>
-              <input
-                type="text"
-                placeholder="100"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
-            </div>
+//       {/* Event Date */}
+//       <div>
+//         <label className="block text-slate-300">Event Date</label>
+//         <input
+//           type="date"
+//           name="date"
+//           value={formData.date}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
 
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold">Ticket Price</h2>
-              <input
-                type="text"
-                placeholder="Rp. 500.000,-"
-                className="input input-bordered input-sm w-full max-w-xs"
-              />
-            </div>
-          </div>
-        </div>
+//       {/* Event Time */}
+//       <div>
+//         <label className="block text-slate-300">Event Time</label>
+//         <input
+//           type="time"
+//           name="time"
+//           value={formData.time}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
 
-        {/* Save Button */}
-        <div className="flex justify-center mt-8">
-          <Link href={'/my-event'}>
-            <button
-              type="button"
-              className="bg-Dark-blue text-white font-medium rounded-lg px-6 py-2.5 hover:bg-blue-800 transition"
-            >
-              OK
-            </button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
+//       {/* Location */}
+//       <div>
+//         <label className="block text-slate-300">Location</label>
+//         <input
+//           type="text"
+//           name="location"
+//           value={formData.location}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Description */}
+//       <div>
+//         <label className="block text-slate-300">Description</label>
+//         <textarea
+//           name="description"
+//           value={formData.description}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         ></textarea>
+//       </div>
+
+//       {/* Available Seats */}
+//       <div>
+//         <label className="block text-slate-300">Available Seats</label>
+//         <input
+//           type="number"
+//           name="availableSeats"
+//           value={formData.availableSeats}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Is Paid Event */}
+//       <div>
+//         <label className="block text-slate-300">Is this a paid event?</label>
+//         <select
+//           name="isPaidEvent"
+//           value={formData.isPaidEvent}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         >
+//           <option value="Free">Free</option>
+//           <option value="Paid">Paid</option>
+//         </select>
+//       </div>
+
+//       {/* Price (only if Paid) */}
+//       {formData.isPaidEvent === "Paid" && (
+//         <div>
+//           <label className="block text-slate-300">Price</label>
+//           <input
+//             type="number"
+//             name="price"
+//             value={formData.price}
+//             onChange={handleChange}
+//             className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//           />
+//         </div>
+//       )}
+
+//       {/* Sell End Date */}
+//       <div>
+//         <label className="block text-slate-300">Sell End Date</label>
+//         <input
+//           type="date"
+//           name="sellEndDate"
+//           value={formData.sellEndDate}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Sell End Time */}
+//       <div>
+//         <label className="block text-slate-300">Sell End Time</label>
+//         <input
+//           type="time"
+//           name="sellEndTime"
+//           value={formData.sellEndTime}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Discount Code */}
+//       <div>
+//         <label className="block text-slate-300">Discount Code</label>
+//         <input
+//           type="text"
+//           name="discountCode"
+//           value={formData.discountCode}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Discount Amount */}
+//       <div>
+//         <label className="block text-slate-300">Discount Amount</label>
+//         <input
+//           type="number"
+//           name="amount"
+//           value={formData.amount}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Quota Available */}
+//       <div>
+//         <label className="block text-slate-300">Quota Available</label>
+//         <input
+//           type="number"
+//           name="quotaAvailable"
+//           value={formData.quotaAvailable}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Valid Until (for discounts) */}
+//       <div>
+//         <label className="block text-slate-300">Discount Valid Until</label>
+//         <input
+//           type="date"
+//           name="validUntil"
+//           value={formData.validUntil}
+//           onChange={handleChange}
+//           className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+//         />
+//       </div>
+
+//       {/* Submit Button */}
+//       <div>
+//         <button type="submit" className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
+//           Create Event
+//         </button>
+//       </div>
+//     </form>
+//   );
+// };
+
+// export default EventForm;
