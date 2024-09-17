@@ -131,7 +131,7 @@ const AccountInfo = () => {
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
-    minHeight: '68.4vh',
+    // minHeight: '68.4vh',
     backgroundColor: '#f9f9f9',
     paddingTop: '0px',
   };
@@ -197,7 +197,7 @@ const AccountInfo = () => {
   };
 
   return (
-    <div style={containerStyle}>
+    <div className='min-h-screen' style={containerStyle}>
       <div style={sidebarStyle}>
         <div
           style={sidebarItemStyle(selectedTab === 'contact')}
