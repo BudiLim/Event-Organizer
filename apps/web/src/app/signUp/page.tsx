@@ -54,8 +54,8 @@ const Register: React.FC = () => {
           ? `Referral Code Owner: ${result.referralOwnerName.toUpperCase()}`
           : '';
 
-        toast.success(<div>Registration successful!<br /><span className='font-bold'>{referralOwner}</span></div>);
-        router.push('/login');
+          router.push('/login');
+          toast.success(<div>Registration successful!<br /><span className='font-bold'>{referralOwner}</span></div>);
       } else {
         // Check if the response is JSON
         try {

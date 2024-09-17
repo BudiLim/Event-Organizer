@@ -20,6 +20,7 @@ interface Event {
   image?: string;
   availableSeats: number;
   isPaidEvent: string;
+  category: string; // Add category field here
   organizer: {
     id: number;
     name: string;
@@ -79,7 +80,7 @@ const DetailEvent = () => {
 
   const applyDiscount = async () => {
     if (!discountCode) return;
-  
+
     try {
       const response = await fetch(
         `http://localhost:8000/api/promotion`,
@@ -91,7 +92,7 @@ const DetailEvent = () => {
           body: JSON.stringify({ discountCode, eventId: event?.id }),
         }
       );
-  
+
       const result = await response.json();
       if (response.ok && result.discount) {
         setDiscountAmount(result.discount.amount);
@@ -105,7 +106,6 @@ const DetailEvent = () => {
       setIsDiscountValid(false);
     }
   };
-  
 
   const handleTicketCreation = async () => {
     if (!event) return;
@@ -152,6 +152,7 @@ const DetailEvent = () => {
   const formatDate = (dateString: string) => {
     return moment(dateString).format('DD MMMM YYYY'); // Formats the date
   };
+
   const formatTime24Hour = (dateString: string) => {
     const date = new Date(dateString);
     const hours = String(date.getHours()).padStart(2, '0');
@@ -191,8 +192,8 @@ const DetailEvent = () => {
               <p className="text-[#d9d9d9]">{event.location}</p>
             </div>
             <div className="text-extrathin text-lg">
-              <h1 className="font-semibold">Organized By</h1>
-              <p className="text-[#d9d9d9]">{event.organizer.name}</p>
+              <h1 className="font-semibold">Category</h1>
+              <p className="text-[#d9d9d9]">{event.category.toLocaleLowerCase()}</p> {/* Updated from Organizer to Category */}
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">General Admission</h1>

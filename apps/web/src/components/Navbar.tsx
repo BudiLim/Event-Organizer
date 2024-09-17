@@ -62,7 +62,7 @@ const Navbar = () => {
         {
           user.id ? (
             <div className="flex gap-[20px]">
-              <SearchInput />
+       
               <FiMenu size={30} color="white" onClick={toggleSidebar} />
             </div>
 
@@ -74,9 +74,6 @@ const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex h-full items-center gap-[30px]">
-        <SearchInput />
-
-        {/* Category dropdown */}
         {checkRole(Role.Experience) &&
         <div className="flex items-center">
           <div className="dropdown dropdown-hover">
@@ -93,7 +90,7 @@ const Navbar = () => {
         }
 
         {checkRole(Role.Organizer) &&
-        <Link href={'/create-event'}>
+        <Link className="text-white font-bold text-[16px]" href={'/create-event'}>
           Create Event
         </Link>
         }
@@ -102,12 +99,9 @@ const Navbar = () => {
           <div>
             {checkRole(Role.Organizer) &&
               <div className="dropdown dropdown-end text-white">
-                <div>
-                  <h1><Link href={'/create-event'}>Create Event</Link></h1>
-                </div>
+               
                 <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white bg-zinc-900 text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
                 <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-44 p-2 shadow">
-                  <li><Link href={'/create-event'}>Create Event</Link></li>
                   <li><Link href={'/dashboard'}>My Dashboard</Link></li>
                   <li><Link href={'/account-settings'}>Account Setting</Link></li>
                   <li><Link onClick={onLogout} href={'/'}>log Out</Link></li>
@@ -149,7 +143,6 @@ const Navbar = () => {
               <h1 className="flex gap-3  items-center font-semibold text-white text-[20px] mb-4"><FiUser />{user.firstName + ' ' + user.lastName}</h1>
               <Link href="/my-event" className="font-semibold text-white text-[15px] mb-4">My event</Link>
               <Link href="/dashboard" className="font-semibold text-white text-[15px] mb-4">DashBoard</Link>
-              <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
               <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account setting</Link>
               <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
             </div>
@@ -159,7 +152,6 @@ const Navbar = () => {
               <h1 className="flex gap-3 items-center font-semibold text-white text-[20px] mb-4"><FiUser />{user.firstName + ' ' + user.lastName}</h1>
               <h1 className="flex items-center gap-2 pb-3 text-white font-medium"><Image src={coin} alt="coin" width={25} />{user.points}</h1>
               <Link href="/my-ticket" className="font-semibold text-white text-[15px] mb-4">My Ticket</Link>
-              <Link href="/category" className="font-semibold text-white text-[15px] mb-4">Category</Link>
               <Link href="/account-settings" className="font-semibold text-white text-[15px] mb-4">Account Setting</Link>
               <Link onClick={onLogout} href="/" className="flex justify-center font-semibold text-black bg-white rounded-full text-[15px] mb-4 w-1/3 p-1">Log Out</Link>
             </div>

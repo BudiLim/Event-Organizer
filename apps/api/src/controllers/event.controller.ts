@@ -1,5 +1,5 @@
 import prisma from '@/prisma';
-import { Prisma } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 import multer = require('multer');
 
@@ -26,7 +26,7 @@ export class EventController {
         organizerId,
         eventDate,
         eventTime,
-        sellEndDate, 
+        sellEndDate,
         sellEndTime,
         discountCode,
         amount,
@@ -45,19 +45,19 @@ export class EventController {
 
       const validCategories = ['SINGLEBAND', 'GROUPBAND', 'DISC_JORKEY'];
       if (!validCategories.includes(category)) {
-        throw new Error ('invalid category')
+        throw new Error('invalid category')
       }
 
       const eventData: Prisma.EventCreateInput = {
         name,
         location,
         description,
-        isPaidEvent: isPaidEvent === 'Paid' ? 'Paid' : 'Free', 
+        isPaidEvent: isPaidEvent === 'Paid' ? 'Paid' : 'Free',
         availableSeats: parseInt(availableSeats),
-        eventDate: new Date(eventDate), 
+        eventDate: new Date(eventDate),
         eventTime: eventDateTime,
-        sellEndDate: new Date(sellEndDate), 
-        sellEndTime: sellEndDateTime, 
+        sellEndDate: new Date(sellEndDate),
+        sellEndTime: sellEndDateTime,
         image: link,
         category: category,
         organizer: { connect: { id: parseInt(organizerId, 10) } },
@@ -78,8 +78,8 @@ export class EventController {
           event: { connect: { id: event.id } },
           discountCode,
           amount: parseFloat(amount),
-          quotaAvailable,
-          quotaUsed: quotaUsed || "0",
+          quotaAvailable: parseInt(quotaAvailable, 10),
+          quotaUsed: parseInt(quotaUsed || '0', 10),
           validUntil: new Date(validUntil)
         };
         await prisma.promotion.create({
@@ -96,13 +96,31 @@ export class EventController {
   }
 
   async getEvent(req: Request, res: Response) {
+    
     try {
-      const { search } = req.query;
-      let filter: Prisma.EventWhereInput = {};
+      const { search, location, category } = req.query;
+      
+      const filter: Prisma.EventWhereInput = {};
 
       if (search) {
         filter.name = { contains: search as string };
       }
+
+      if (location) {
+        filter.location = { contains: location as string }
+      }
+
+      if (category && typeof category === 'string') {
+        const validCategories = ['SINGLEBAND', 'GROUPBAND', 'DISC_JORKEY'];
+  
+        const upperCategory = category.toUpperCase();
+        if (validCategories.includes(upperCategory)) {
+          filter.category = upperCategory as Category; // Use the raw string here instead of Prisma.Category
+        } else {
+          return res.status(400).json({ msg: 'Invalid category' });
+        }
+      }
+
       const events = await prisma.event.findMany({
         where: filter,
         include: { organizer: true },

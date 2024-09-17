@@ -23,7 +23,7 @@ export default function Footer() {
             <p className="hover:font-bold hover:text-white">Virtual Events Platform</p>
             <p className="hover:font-bold hover:text-white">Post your event online</p>
           </div>
-          <div className="text-[#d9d9d9] text-[9px]">
+          <div className="text-[#d9d9d9] text-[9px] ">
             <h1 className="font-semibold text-sm pb-1 text-white">Contact Us</h1>
             <p className="hover:font-bold hover:text-white">Contact Support</p>
             <p className="hover:font-bold hover:text-white">Contact Sales</p>
