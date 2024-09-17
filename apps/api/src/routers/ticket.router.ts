@@ -15,6 +15,7 @@ export class TicketRouter {
   private initializeRoutes(): void {
     // Route to get all tickets for a specific user
     this.router.get('/:userId', verifyToken,checkExperience, this.ticketController.getMyTicketDetails);
+    this.router.post('/ticket', verifyToken,checkExperience, this.ticketController.createTicket);
 
     // Route to get a specific ticket by ID for a specific user
     this.router.get('/:userId/:id', verifyToken, checkExperience,this.ticketController.getTicketId);

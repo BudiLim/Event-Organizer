@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-
 import Link from 'next/link';
 
 // Define the Event type
@@ -10,9 +9,12 @@ interface Event {
   name: string;
   description: string;
   location: string;
-  date: string;
-  time: string;
+  eventDate: string;
+  eventTime: string;
+  sellEndDate: string;
+  sellEndTime: string;
   image: string;
+  price: number;
   availableSeats: number;
   isPaidEvent: string;
   organizer: {
