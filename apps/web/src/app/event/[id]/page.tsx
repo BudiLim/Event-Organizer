@@ -201,21 +201,15 @@ const DetailEvent = () => {
               <h1>Discount Voucher</h1>
               <input
                 type="text"
-                placeholder="Discount Code Here . . ."
+                placeholder="Discount Code Here"
                 value={discountCode.toUpperCase()}
                 onChange={handleDiscountChange}
                 className="input input-bordered bg-slate-800"
               />
-              <button
-                onClick={applyDiscount}
-                className="bg-blue-700 p-2 rounded-lg mt-2"
-              >
-                Apply Discount
-              </button>
               {isDiscountValid}
             </div>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-2 items-center">
             <h1 className="font-bold pr-3">
               Total: Rp.{' '}
               {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
