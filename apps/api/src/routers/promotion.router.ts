@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { verifyToken } from '@/middlewares/token';
 import { PromotionController } from '@/controllers/promotion.controller';
 
 export class PromotionRouter {
@@ -13,8 +12,8 @@ export class PromotionRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/apply', verifyToken, this.promotionController.applyDiscount);
-    this.router.post('/apply-discount', verifyToken, this.promotionController.applyDiscount.bind(this.promotionController));
+    this.router.post('/apply-discount', this.promotionController.applyDiscount.bind(this.promotionController));
+    this.router.post('/discount-code', this.promotionController.applyDiscount);
   }
 
   getRouter(): Router {

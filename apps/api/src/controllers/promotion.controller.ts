@@ -1,38 +1,53 @@
-import { PromotionService } from '@/middlewares/promotion.service';
+import prisma from '@/prisma';
 import { Request, Response } from 'express';
 
 export class PromotionController {
-  private promotionService: PromotionService;
-
-  constructor() {
-    this.promotionService = new PromotionService();
-  }
-
-  // Apply a discount based on a discount code and event ID
   async applyDiscount(req: Request, res: Response): Promise<void> {
-    const { discountCode, eventId } = req.body;
-
-    // Validate the inputs
-    if (!discountCode || !eventId) {
-      res.status(400).json({ message: 'Invalid discount code or event ID' });
-      return;
-    }
-
     try {
-      // Fetch the discount using the service
-      const discount = await this.promotionService.applyDiscount(discountCode, eventId);
+      const { discountCode, eventId } = req.body;
 
-      if (discount) {
-        res.status(200).json({
-          message: 'Discount applied successfully',
-          discountAmount: discount.amount,
+      if (!discountCode || !eventId) {
+        res.status(400).send({
+          status: 'error',
+          msg: 'Discount code and event ID are required.',
         });
-      } else {
-        res.status(400).json({ message: 'Invalid or expired discount code' });
+        return;
       }
-    } catch (error) {
-      console.error('Error applying discount:', error);
-      res.status(500).json({ message: 'Internal server error' });
+
+      // Adjust the Prisma query to use discountVoucher if it's unique
+      const discount = await prisma.promotion.findUnique({
+        where: { discountCode: discountCode },
+      });
+
+      if (!discount) {
+        res.status(400).send({
+          status: 'error',
+          msg: 'Invalid or expired discount code.',
+        });
+        return;
+      }
+
+      if (new Date() > new Date(discount.validUntil)) {
+        res.status(400).send({
+          status: 'error',
+          msg: 'Discount code has expired.',
+        });
+        return;
+      }
+
+      const discountAmount = discount.amount;
+
+      res.status(200).send({
+        status: 'ok',
+        msg: 'Discount applied successfully!',
+        discountAmount,
+      });
+    } catch (err) {
+      console.error('Error applying discount:', err);
+      res.status(500).send({
+        status: 'error',
+        msg: 'Internal server error',
+      });
     }
   }
 }

@@ -6,25 +6,7 @@ import { useParams } from 'next/navigation';
 import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
 import { toast } from 'react-toastify';
-
-interface Event {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
-  eventDate: string;
-  eventTime: string;
-  sellEndDate: string;
-  sellEndTime: string;
-  price: number;
-  image?: string;
-  availableSeats: number;
-  isPaidEvent: string;
-  organizer: {
-    id: number;
-    name: string;
-  };
-}
+import { Event } from '@/type/user';
 
 const DetailEvent = () => {
   const { id } = useParams();
@@ -79,22 +61,23 @@ const DetailEvent = () => {
 
   const applyDiscount = async () => {
     if (!discountCode) return;
-  
+
     try {
       const response = await fetch(
-        `http://localhost:8000/api/promotion`,
+        `http://localhost:8000/api/promotion/discount-code`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ discountCode, eventId: event?.id }),
-        }
+        },
       );
-  
+
       const result = await response.json();
+
       if (response.ok && result.discount) {
-        setDiscountAmount(result.discount.amount);
+        setDiscountAmount(result.discount.percentage);
         setIsDiscountValid(true);
       } else {
         setIsDiscountValid(false);
@@ -105,37 +88,34 @@ const DetailEvent = () => {
       setIsDiscountValid(false);
     }
   };
-  
 
   const handleTicketCreation = async () => {
     if (!event) return;
 
     const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
-    const totalAmount = ticketPrice * ticketCount - discountAmount; // Calculate total amount
-
-    // Ensure totalAmount isn't negative (if discount is greater than ticket price)
-    const finalAmount = totalAmount < 0 ? 0 : totalAmount;
-
-    setIsCreatingTicket(true);
-    setTicketError(null);
-    setTicketSuccess(null);
+    const totalAmountBeforeDiscount = ticketPrice * ticketCount;
+    const discountAmountInCurrency =
+      (totalAmountBeforeDiscount * discountAmount) / 10;
+    const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
+    const totalPrice = finalAmount < 0 ? 0 : finalAmount;
 
     try {
       const { result, ok } = await createTicket(
         event.id,
         ticketPrice,
         ticketCount,
-        finalAmount,
+        totalPrice,
         discountCode,
       );
 
       if (ok) {
         toast.success('Ticket created successfully!');
-        // Handle further actions after successful ticket creation
+        setTicketSuccess;
       } else {
-        toast.error(result?.message || 'Failed to create ticket');
+        toast.error(result?.message || 'Failed! Maybe Voucher invalid or expired');
       }
     } catch (error) {
+      setTicketError;
       toast.error('An unexpected error occurred');
     } finally {
       setIsCreatingTicket(false);
@@ -143,14 +123,18 @@ const DetailEvent = () => {
   };
 
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
-  const totalPrice = ticketPrice * ticketCount - discountAmount;
+  const totalAmountBeforeDiscount = ticketPrice * ticketCount;
+  const discountAmountInCurrency =
+    (totalAmountBeforeDiscount * discountAmount) / 10;
+  const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
+  const totalPrice = finalAmount < 0 ? 0 : finalAmount;
 
   if (loading) return <p>Loading...</p>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
   if (!event) return <p>No event data</p>;
 
   const formatDate = (dateString: string) => {
-    return moment(dateString).format('DD MMMM YYYY'); // Formats the date
+    return moment(dateString).format('DD MMMM YYYY');
   };
   const formatTime24Hour = (dateString: string) => {
     const date = new Date(dateString);
@@ -218,7 +202,7 @@ const DetailEvent = () => {
               <input
                 type="text"
                 placeholder="Discount Code Here . . ."
-                value={discountCode}
+                value={discountCode.toUpperCase()}
                 onChange={handleDiscountChange}
                 className="input input-bordered bg-slate-800"
               />
@@ -228,15 +212,14 @@ const DetailEvent = () => {
               >
                 Apply Discount
               </button>
-              {isDiscountValid === false && (
-                <p className="text-red-500">Invalid Discount Code</p>
-              )}
+              {isDiscountValid}
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <h1 className="font-bold">
+            <h1 className="font-bold pr-3">
               Total: Rp.{' '}
-              {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
+              {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
+              ,-
             </h1>
             <button
               onClick={handleTicketCreation}

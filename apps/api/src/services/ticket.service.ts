@@ -56,6 +56,9 @@ export class TicketService {
       throw new Error('Not enough available seats');
     }
 
+    const priceBeforeDiscount = price * quantity ;
+    const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
+    const priceAfterDiscount = priceBeforeDiscount - discountUnit;
     // Create tickets
     const ticketData = Array.from({ length: quantity }, () => ({
       eventId,
@@ -63,8 +66,8 @@ export class TicketService {
       price: event.price - discountAmount,
       status: Status.Active,
       purchaseDate: new Date(),
-      quantity: 1, // assuming each ticket has a quantity of 1
-      totalPrice: event.price - discountAmount, // calculate the total price
+      quantity: 1,
+      totalPrice: priceAfterDiscount,
     }));
 
     // Create tickets individually if createMany is not working
