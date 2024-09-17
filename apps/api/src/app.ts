@@ -15,6 +15,8 @@ import { ReferralRouter } from './routers/referral.router';
 import { EventRouter } from './routers/event.router';
 import { DashboardRouter } from './routers/dashboard.router';
 import { TicketRouter } from './routers/ticket.router';
+import { PromotionRouter } from './routers/promotion.router';
+import { TransactionRouter } from './routers/transction.router';
 
 export default class App {
   private app: Express;
@@ -70,6 +72,8 @@ export default class App {
     const eventRouter = new EventRouter();
     const dashboardRouter = new DashboardRouter();
     const ticketRouter = new TicketRouter();
+    const promotionRouter = new PromotionRouter();
+    const transactionRouter = new TransactionRouter();
     this.app.use('/api/referrals', referralRouter.getRouter());
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -81,6 +85,11 @@ export default class App {
     this.app.use('/api/dashboard', dashboardRouter.getRouter());
     this.app.use('/api/ticket', ticketRouter.getRouter());
     this.app.use('/api/event', eventRouter.getRouter());
+    this.app.use('/api', ticketRouter.getRouter());
+    this.app.use('/api/promotion', promotionRouter.getRouter());
+    this.app.use('/api/transaction', transactionRouter.getRouter());
+    
+
     
   }
 

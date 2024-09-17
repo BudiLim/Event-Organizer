@@ -93,11 +93,11 @@ const Navbar = () => {
         {user.id ? (
           <div>
             {checkRole(Role.Organizer) &&
-              <div className="dropdown dropdown-end text-white">
+              <div className="dropdown dropdown-end text-black">
                 <div tabIndex={0} role="button" className="btn bg-opacity-0 text-white bg-zinc-900 text-[15px]"><FiUser /> {user.firstName + ' ' + user.lastName}</div>
                 <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-44 p-2 shadow">
-                  <li><Link href={'/my-event'}>My Event</Link></li>
-                  <li><Link href={'/dashboard'}>Dashbord</Link></li>
+                  <li><Link href={'/create-event'}>Create Event</Link></li>
+                  <li><Link href={'/dashboard'}>My Dashboard</Link></li>
                   <li><Link href={'/account-settings'}>Account Setting</Link></li>
                   <li><Link onClick={onLogout} href={'/'}>log Out</Link></li>
                 </ul>
@@ -124,8 +124,6 @@ const Navbar = () => {
         )}
 
       </div>
-
-
 
 
       {/* Sidebar for smaller screens */}

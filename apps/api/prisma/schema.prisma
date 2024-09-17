@@ -68,13 +68,27 @@ model Event {
   Transaction Transaction[]
 }
 
+enum Status {
+  Active
+  Expired
+  Cancelled
+}
+
 model Ticket {
-  id           Int      @id @default(autoincrement())
-  eventId      Int
-  userId       Int
-  purchaseDate DateTime @default(now())
-  price        Float
-  status       String   @default("Active")
+  id                 Int      @id @default(autoincrement())
+  eventId            Int
+  userId             Int
+  purchaseDate       DateTime @default(now())
+  quantity           Int
+  price              Float
+  totalPrice         Float
+  status             Status   @default(Active)
+  discountCode       String?
+  discountAmount     Float?
+  seatNumber         String?
+  section            String?
+  paymentMethod      String?
+  cancellationReason String?
 
   // Relations
   event Event @relation("EventTickets", fields: [eventId], references: [id])
@@ -97,10 +111,10 @@ model Review {
 model Promotion {
   id             Int      @id @default(autoincrement())
   eventId        Int
-  discountCode   String
+  discountCode   String   @unique
   amount         Float
-  quotaAvailable String
-  quotaUsed      String
+  quotaAvailable Int
+  quotaUsed      Int
   validUntil     DateTime
   createdAt      DateTime @default(now())
 
