@@ -98,6 +98,8 @@ const DetailEvent = () => {
       (totalAmountBeforeDiscount * discountAmount) / 10;
     const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
     const totalPrice = finalAmount < 0 ? 0 : finalAmount;
+    const singleDiscount = (event.price * discountAmount) / 100;
+    const singlePrice = event.price - singleDiscount;
 
     try {
       const { result, ok } = await createTicket(
@@ -121,6 +123,11 @@ const DetailEvent = () => {
       setIsCreatingTicket(false);
     }
   };
+
+  const handlePurchase = () => {
+    handleTicketCreation();
+    applyDiscount();
+  }
 
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
   const totalAmountBeforeDiscount = ticketPrice * ticketCount;
@@ -216,7 +223,7 @@ const DetailEvent = () => {
               ,-
             </h1>
             <button
-              onClick={handleTicketCreation}
+              onClick={handlePurchase}
               disabled={isCreatingTicket}
               className="bg-blue-700 p-2 rounded-lg"
             >

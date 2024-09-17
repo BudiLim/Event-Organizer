@@ -34,7 +34,7 @@ CREATE TABLE `Event` (
     `image` VARCHAR(191) NOT NULL,
     `availableSeats` INTEGER NOT NULL,
     `isPaidEvent` ENUM('Free', 'Paid') NOT NULL,
-    `category` ENUM('SingleBand', 'GroupBand', 'DiscJorkey') NOT NULL,
+    `category` ENUM('SINGLEBAND', 'GROUPBAND', 'DISC_JORKEY') NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -47,8 +47,16 @@ CREATE TABLE `Ticket` (
     `eventId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
     `purchaseDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `quantity` INTEGER NOT NULL,
     `price` DOUBLE NOT NULL,
-    `status` VARCHAR(191) NOT NULL DEFAULT 'Active',
+    `totalPrice` DOUBLE NOT NULL,
+    `status` ENUM('Active', 'Expired', 'Cancelled') NOT NULL DEFAULT 'Active',
+    `discountCode` VARCHAR(191) NULL,
+    `discountAmount` DOUBLE NULL,
+    `seatNumber` VARCHAR(191) NULL,
+    `section` VARCHAR(191) NULL,
+    `paymentMethod` VARCHAR(191) NULL,
+    `cancellationReason` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -71,11 +79,12 @@ CREATE TABLE `Promotion` (
     `eventId` INTEGER NOT NULL,
     `discountCode` VARCHAR(191) NOT NULL,
     `amount` DOUBLE NOT NULL,
-    `quotaAvailable` VARCHAR(191) NOT NULL,
-    `quotaUsed` VARCHAR(191) NOT NULL,
+    `quotaAvailable` INTEGER NOT NULL,
+    `quotaUsed` INTEGER NOT NULL,
     `validUntil` DATETIME(3) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Promotion_discountCode_key`(`discountCode`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
