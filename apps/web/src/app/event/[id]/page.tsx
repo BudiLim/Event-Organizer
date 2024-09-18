@@ -8,6 +8,7 @@ import moment from 'moment';
 import { toast } from 'react-toastify';
 import { Event } from '@/type/user';
 
+
 const DetailEvent = () => {
   const { id } = useParams();
 
@@ -143,6 +144,7 @@ const DetailEvent = () => {
   const formatDate = (dateString: string) => {
     return moment(dateString).format('DD MMMM YYYY');
   };
+
   const formatTime24Hour = (dateString: string) => {
     const date = new Date(dateString);
     const hours = String(date.getHours()).padStart(2, '0');
@@ -182,8 +184,8 @@ const DetailEvent = () => {
               <p className="text-[#d9d9d9]">{event.location}</p>
             </div>
             <div className="text-extrathin text-lg">
-              <h1 className="font-semibold">Organized By</h1>
-              <p className="text-[#d9d9d9]">{event.organizer.name}</p>
+              <h1 className="font-semibold">Category</h1>
+              <p className="text-[#d9d9d9]">{event.category.toLocaleLowerCase()}</p> {/* Updated from Organizer to Category */}
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">General Admission</h1>

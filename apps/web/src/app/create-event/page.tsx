@@ -70,8 +70,10 @@ const CreateEvent = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-gray-800 text-white rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Create Event</h2>
+    <div className="max-w-xl mx-auto py-10 text-white ">
+      <div className='shadow-white shadow-sm p-6 rounded-lg '>
+
+      <h2 className="text-2xl font-bold mb-4 text-center">Create Event</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-2">Event Name</label>
@@ -220,6 +222,15 @@ const CreateEvent = () => {
             required
           />
         </div>
+        {formData.image && (
+          <div className="mt-4">
+            <img
+              src={URL.createObjectURL(formData.image)}
+              alt="Event Preview"
+              className="w-full h-48 object-cover rounded"
+            />
+          </div>
+        )}
 
         <div>
           <label className="block mb-2">Organizer ID</label>
@@ -282,6 +293,7 @@ const CreateEvent = () => {
           Create Event
         </button>
       </form>
+      </div>
     </div>
   );
 };

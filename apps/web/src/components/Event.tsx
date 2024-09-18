@@ -7,7 +7,7 @@ import { FiChevronRight } from "react-icons/fi";import Link from "next/link";
 
 export default function Event() {
     return (
-        <div className="flex flex-col items-center text-white py-[30px]">
+        <div className="flex flex-col items-center min-h-screen text-white py-[30px]">
             <h1 className="text-xl md:text-2xl lg:text-3xl">On Going<span className="font">Event</span></h1>
                 <div className="pt-[35px]">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-20 ">
