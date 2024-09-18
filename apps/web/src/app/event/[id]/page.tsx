@@ -104,7 +104,7 @@ const DetailEvent = () => {
     try {
       const { result, ok } = await createTicket(
         event.id,
-        ticketPrice,
+        singlePrice,
         ticketCount,
         totalPrice,
         discountCode,
