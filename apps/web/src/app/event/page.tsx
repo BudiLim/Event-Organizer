@@ -4,7 +4,6 @@ import { getEvent } from "@/lib/event";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
