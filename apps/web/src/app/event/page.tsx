@@ -8,9 +8,9 @@ import { useDebounce } from "use-debounce";
 // Define available categories
 const categories = [
   { label: "All Categories", value: "" },
-  { label: "Single Band", value: "singleband" },
-  { label: "Group Band", value: "groupband" },
-  { label: "Disc Jockey", value: "discjockey" },
+  { label: "Single Band", value: "SINGLEBAND" },
+  { label: "Group Band", value: "GROUPBAND" },
+  { label: "Disc Jockey", value: "DISC_JORKEY" },
 ];
 
 export default function SearchBlog() {
