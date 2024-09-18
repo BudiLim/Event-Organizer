@@ -1,7 +1,11 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+
 
 const CreateEvent = () => {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -58,7 +62,16 @@ const CreateEvent = () => {
       });
 
       if (response.ok) {
-        alert('Event created successfully!');
+        toast.success('Event created successfully!', {
+          position: 'bottom-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        router.push('/event')
       } else {
         const error = await response.json();
         alert(`Error: ${error.msg}`);

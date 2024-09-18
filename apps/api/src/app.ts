@@ -5,7 +5,6 @@ import express, {
   Request,
   Response,
   NextFunction,
-  Router,
 } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -17,6 +16,7 @@ import { DashboardRouter } from './routers/dashboard.router';
 import { TicketRouter } from './routers/ticket.router';
 import { PromotionRouter } from './routers/promotion.router';
 import { TransactionRouter } from './routers/transction.router';
+import { FeedbackRouter } from './routers/feedback.router'; // Import FeedbackRouter
 
 export default class App {
   private app: Express;
@@ -66,6 +66,7 @@ export default class App {
       },
     );
   }
+
   private routes(): void {
     const userRouter = new UserRouter();
     const referralRouter = new ReferralRouter();
@@ -74,6 +75,8 @@ export default class App {
     const ticketRouter = new TicketRouter();
     const promotionRouter = new PromotionRouter();
     const transactionRouter = new TransactionRouter();
+    const feedbackRouter = new FeedbackRouter(); // Use FeedbackRouter
+
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
@@ -83,10 +86,9 @@ export default class App {
     this.app.use('/api/dashboard', dashboardRouter.getRouter());
     this.app.use('/api/ticket', ticketRouter.getRouter());
     this.app.use('/api/event', eventRouter.getRouter());
-    this.app.use('/api', ticketRouter.getRouter());
     this.app.use('/api/transaction', transactionRouter.getRouter());
     this.app.use('/api/promotion', promotionRouter.getRouter());
-    
+    this.app.use('/api/feedback', feedbackRouter.getRouter()); // Add feedback routes
   }
 
   public start(): void {
