@@ -99,11 +99,13 @@ const DetailEvent = () => {
       (totalAmountBeforeDiscount * discountAmount) / 10;
     const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
     const totalPrice = finalAmount < 0 ? 0 : finalAmount;
+    const singleDiscount = (event.price * discountAmount) / 100;
+    const singlePrice = event.price - singleDiscount;
 
     try {
       const { result, ok } = await createTicket(
         event.id,
-        ticketPrice,
+        singlePrice,
         ticketCount,
         totalPrice,
         discountCode,
@@ -122,6 +124,11 @@ const DetailEvent = () => {
       setIsCreatingTicket(false);
     }
   };
+
+  const handlePurchase = () => {
+    handleTicketCreation();
+    applyDiscount();
+  }
 
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
   const totalAmountBeforeDiscount = ticketPrice * ticketCount;
@@ -203,28 +210,26 @@ const DetailEvent = () => {
               <h1>Discount Voucher</h1>
               <input
                 type="text"
-                placeholder="Discount Code Here . . ."
+                placeholder="Discount Code Here"
                 value={discountCode.toUpperCase()}
                 onChange={handleDiscountChange}
                 className="input input-bordered bg-slate-800"
               />
-              <button
-                onClick={applyDiscount}
-                className="bg-blue-700 p-2 rounded-lg mt-2"
-              >
-                Apply Discount
-              </button>
               {isDiscountValid}
             </div>
+            <div>
+              <h1>Use Point (On Progress ... )</h1>
+            <input type="range" min={0} max="100" value="40" className="range range-primary" />
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <h1 className="font-bold pr-3">
+          <div className="flex flex-col gap-2 items-center">
+            <h1 className="font-bold pr-4">
               Total: Rp.{' '}
               {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
               ,-
             </h1>
             <button
-              onClick={handleTicketCreation}
+              onClick={handlePurchase}
               disabled={isCreatingTicket}
               className="bg-blue-700 p-2 rounded-lg"
             >

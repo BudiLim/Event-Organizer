@@ -53,6 +53,7 @@ export interface Event {
   image?: string;
   availableSeats: number;
   isPaidEvent: string;
+  category: string;
   organizer: {
     id: number;
     name: string;
