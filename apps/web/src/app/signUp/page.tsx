@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import from next/navigation
-import { regUser } from '@/lib/user'; // Import the regUser function
+import { useRouter } from 'next/navigation'; 
+import { regUser } from '@/lib/user';
 import { toast } from 'react-toastify';
 
 const Register: React.FC = () => {
@@ -54,8 +54,27 @@ const Register: React.FC = () => {
           ? `Referral Code Owner: ${result.referralOwnerName.toUpperCase()}`
           : '';
 
-          router.push('/login');
-          toast.success(<div>Registration successful!<br /><span className='font-bold'>{referralOwner}</span></div>);
+        await new Promise<void>((resolve) => {
+          toast.success(
+            <div>
+              Registration successful!
+              <br />
+              <span className="font-bold">{referralOwner}</span>
+            </div>,
+            {
+              onClose: () => resolve(), // Resolve the promise when toast closes
+            },
+          );
+        });
+        const toProperCase = (str: string) => {
+          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        };
+        toast.success(
+          <h1 className="text-xl">
+            Welcome {toProperCase(firstName)} {toProperCase(lastName)}
+          </h1>,
+        );
+        router.push('/login');
       } else {
         // Check if the response is JSON
         try {

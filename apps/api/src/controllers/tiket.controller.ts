@@ -1,4 +1,4 @@
-import { TicketService } from '@/middlewares/ticket.service';
+import { TicketService } from '@/services/ticket.service';
 import prisma from '@/prisma';
 import { Request, Response } from 'express';
 
@@ -116,37 +116,72 @@ export class TicketController {
   }
 
   async createTicket(req: Request, res: Response) {
-    const { eventId, quantity, paymentMethod, price, discountCode } = req.body;
-    const userId = req.user?.id; // Ensure that req.user is not undefined
+    const { eventId, quantity, price, discountCode } = req.body;
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ message: 'Unauthorized: User not found' });
     }
 
     try {
+      // Calculate total amount before discount
+      const totalAmountBeforeDiscount = price * quantity;
+
+      // Initialize discountAmount
+      let discountAmount = 0;
+
+      if (discountCode) {
+        // Validate and apply the discount code
+        const discount = await prisma.promotion.findUnique({
+          where: { discountCode: discountCode },
+        });
+
+        if (!discount) {
+          return res.status(400).json({
+            status: 'error',
+            message: 'Invalid or expired discount code.',
+          });
+        }
+
+        if (new Date() > new Date(discount.validUntil)) {
+          return res.status(400).json({
+            status: 'error',
+            message: 'Discount code has expired.',
+          });
+        }
+
+        // Get the discount amount from the database
+        discountAmount = discount.amount;
+      }
+
+      // Calculate the final amount after discount
+      const amountDiscount = (totalAmountBeforeDiscount * discountAmount) / 100;
+      const finalAmount = totalAmountBeforeDiscount - amountDiscount;
+      const singleDiscount = (price * discountAmount) / 100;
+      const singlePrice = price - singleDiscount;
+
+      // Proceed with ticket creation
       const ticket = await TicketService.purchaseTicket({
         userId,
         eventId,
-        quantity,
-        price,
+        quantity: quantity,
+        price: singlePrice,
         discountCode,
       });
 
-      // Calculate the total amount based on ticket price, quantity, and discount (if any)
-      const totalAmount = price * quantity; // Add your discount logic if necessary
-
-      // Create the transaction after the ticket is created
+      // Record the transaction with the final amount
       const transaction = await prisma.transaction.create({
         data: {
           userId,
           eventId,
-          amount: totalAmount,
+          amount: finalAmount,
         },
       });
 
       return res.status(201).json({
         status: 'success',
         ticket,
+        finalAmount,
       });
     } catch (error) {
       console.error('Error creating ticket:', error);

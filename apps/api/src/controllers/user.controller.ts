@@ -114,7 +114,7 @@ export class UserController {
             password: hashPassword,
             phone,
             userType,
-            referralCode: referralCode || null, // Store referral code if provided
+            referralCode: referralCode || null,
             userUniqueCode,
           },
         });
