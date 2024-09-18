@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import Image from 'next/image';
 import Link from 'next/link';
+import FeedbackForm from "../feedback/page";
+import FeedbackList from "../feedback-list/page";
 
 interface Event {
   id: number;
@@ -29,9 +31,9 @@ interface Event {
 // Define available categories
 const categories = [
   { label: "All Categories", value: "" },
-  { label: "Single Band", value: "singleband" },
-  { label: "Group Band", value: "groupband" },
-  { label: "Disc Jockey", value: "discjockey" },
+  { label: "Single Band", value: "SINGLEBAND" },
+  { label: "Group Band", value: "GROUPBAND" },
+  { label: "Disc Jockey", value: "DISC_JORKEY" },
 ];
 
 export default function SearchBlog() {
@@ -150,40 +152,11 @@ export default function SearchBlog() {
         </div>
       </div>
 
-      {/* Feedback Section */}
-      <div className="py-8 p-5 border border-gray-300 rounded-md bg-black text-white">
-        <h3 className="text-lg font-bold mb-4">Submit Your Feedback</h3>
-        <form onSubmit={handleFeedbackSubmit}>
-          <textarea
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="border p-2 w-full h-24 text-white rounded-md mb-4"
-            placeholder="Write your feedback..."
-          ></textarea>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          >
-            Submit Feedback
-          </button>
-        </form>
+      <FeedbackForm/>
+      <FeedbackList/>
 
-        {/* Display Submitted Feedback */}
-        <div className="mt-8 ">
-          <h4 className="text-md font-semibold">Feedbacks:</h4>
-          {feedbackList.length > 0 ? (
-            <ul className="list-disc list-inside mt-4">
-              {feedbackList.map((item, index) => (
-                <li key={index} className="my-2">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 mt-4">No feedback yet. Be the first to submit!</p>
-          )}
-        </div>
-      </div>
+
     </div>
+
   );
 }
