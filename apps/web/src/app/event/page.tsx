@@ -4,6 +4,28 @@ import { getEvent } from "@/lib/event";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+interface Event {
+  id: number;
+  name: string;
+  description: string;
+  location: string;
+  eventDate: string;
+  eventTime: string;
+  sellEndDate: string;
+  sellEndTime: string;
+  image: string;
+  price: number;
+  availableSeats: number;
+  isPaidEvent: string;
+  organizer: {
+    id: number;
+    name: string;
+  };
+}
 
 // Define available categories
 const categories = [

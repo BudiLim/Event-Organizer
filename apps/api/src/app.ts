@@ -74,22 +74,18 @@ export default class App {
     const ticketRouter = new TicketRouter();
     const promotionRouter = new PromotionRouter();
     const transactionRouter = new TransactionRouter();
-    this.app.use('/api/referrals', referralRouter.getRouter());
-
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
-
+    this.app.use('/api/referrals', referralRouter.getRouter());
     this.app.use('/api/user', userRouter.getRouter());
     this.app.use('/api/create-event', eventRouter.getRouter());
     this.app.use('/api/dashboard', dashboardRouter.getRouter());
     this.app.use('/api/ticket', ticketRouter.getRouter());
     this.app.use('/api/event', eventRouter.getRouter());
     this.app.use('/api', ticketRouter.getRouter());
-    this.app.use('/api/promotion', promotionRouter.getRouter());
     this.app.use('/api/transaction', transactionRouter.getRouter());
-    
-
+    this.app.use('/api/promotion', promotionRouter.getRouter());
     
   }
 
