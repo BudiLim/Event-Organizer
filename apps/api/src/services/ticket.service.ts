@@ -59,11 +59,12 @@ export class TicketService {
     const priceBeforeDiscount = price * quantity;
     const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
     const priceAfterDiscount = priceBeforeDiscount - discountUnit;
+    const singleDiscountPrice = (price * discountAmount) / 100;
     // Create tickets
     const ticketData = Array.from({ length: quantity }, () => ({
       eventId,
       userId,
-      price: event.price - discountUnit,
+      price: event.price - singleDiscountPrice,
       status: Status.Active,
       purchaseDate: new Date(),
       quantity: 1,

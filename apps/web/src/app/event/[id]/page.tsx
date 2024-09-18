@@ -217,9 +217,13 @@ const DetailEvent = () => {
               />
               {isDiscountValid}
             </div>
+            <div>
+              <h1>Use Point (On Progress ... )</h1>
+            <input type="range" min={0} max="100" value="40" className="range range-primary" />
+            </div>
           </div>
           <div className="flex flex-col gap-2 items-center">
-            <h1 className="font-bold pr-3">
+            <h1 className="font-bold pr-4">
               Total: Rp.{' '}
               {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
               ,-
