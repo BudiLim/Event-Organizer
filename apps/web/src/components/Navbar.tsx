@@ -75,6 +75,7 @@ const Navbar = () => {
       <div className="hidden lg:flex h-full items-center gap-[30px]">
         {checkRole(Role.Experience) && (
           <div className="flex items-center">
+            <div>
             <div className="dropdown dropdown-hover">
               <div
                 tabIndex={1}
@@ -98,6 +99,7 @@ const Navbar = () => {
                 </li>
               </ul>
             </div>
+            </div>
           </div>
         )}
 
@@ -113,7 +115,7 @@ const Navbar = () => {
         {user.id ? (
           <div>
             {checkRole(Role.Organizer) && (
-              <div className="dropdown dropdown-end text-white">
+              <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}
                   role="button"

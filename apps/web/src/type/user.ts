@@ -38,6 +38,8 @@ export interface IUserState {
   email: string;
   userType: string;
   points: number;
+  voucherCode: String;
+  discount: Discount
 }
 
 export interface Event {
@@ -90,10 +92,17 @@ export interface TicketDetails {
   event: Event;
 }
 
-interface TicketPurchaseData {
+export interface TicketPurchaseData {
   userId: number;
   eventId: number;
   quantity: number;
   paymentMethod: string;
   discountCode?: string;
+}
+
+export interface Discount {
+  userId: number;
+  discountVoucher: number;
+  voucherCode: string;
+  validUntil: string;
 }

@@ -11,7 +11,6 @@ import { Event } from '@/type/user';
 
 const DetailEvent = () => {
   const { id } = useParams();
-
   const [event, setEvent] = useState<Event | null>(null);
   const [ticketCount, setTicketCount] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -23,6 +22,7 @@ const DetailEvent = () => {
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
 
+  
   useEffect(() => {
     if (id) {
       const fetchEvent = async () => {
@@ -38,31 +38,24 @@ const DetailEvent = () => {
           setLoading(false);
         }
       };
-
       fetchEvent();
     }
   }, [id]);
-
   const plusCount = () => {
     if (ticketCount < 100) setTicketCount((prev) => prev + 1);
   };
-
   const minusCount = () => {
     if (ticketCount > 1) setTicketCount((prev) => prev - 1);
   };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(1, Math.min(100, Number(e.target.value) || 1));
     setTicketCount(value);
   };
-
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiscountCode(e.target.value);
   };
-
   const applyDiscount = async () => {
-    if (!discountCode) return;
-
+    if (!discountCode || !event?.id) return;
     try {
       const response = await fetch(
         `http://localhost:8000/api/promotion/discount-code`,
@@ -71,12 +64,10 @@ const DetailEvent = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ discountCode, eventId: event?.id }),
-        },
+          body: JSON.stringify({ discountCode, eventId: event.id }),
+        }
       );
-
       const result = await response.json();
-
       if (response.ok && result.discount) {
         setDiscountAmount(result.discount.percentage);
         setIsDiscountValid(true);
@@ -87,71 +78,71 @@ const DetailEvent = () => {
     } catch (error) {
       console.error('Error applying discount:', error);
       setIsDiscountValid(false);
+      setDiscountAmount(0);
     }
   };
-
+  
   const handleTicketCreation = async () => {
     if (!event) return;
-
     const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
     const totalAmountBeforeDiscount = ticketPrice * ticketCount;
-    const discountAmountInCurrency =
-      (totalAmountBeforeDiscount * discountAmount) / 10;
+    const discountAmountInCurrency = (totalAmountBeforeDiscount * discountAmount) / 100;
+  
+    setIsCreatingTicket(true);
+    setTicketError(null);
+    setTicketSuccess(null);
+  
     const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
     const totalPrice = finalAmount < 0 ? 0 : finalAmount;
     const singleDiscount = (event.price * discountAmount) / 100;
     const singlePrice = event.price - singleDiscount;
-
+  
     try {
       const { result, ok } = await createTicket(
         event.id,
         singlePrice,
         ticketCount,
         totalPrice,
-        discountCode,
+        discountCode
       );
-
       if (ok) {
         toast.success('Ticket created successfully!');
-        setTicketSuccess;
+        setTicketSuccess('Ticket created successfully!');
       } else {
         toast.error(result?.message || 'Failed! Maybe Voucher invalid or expired');
+        setTicketError(result?.message || 'Failed! Maybe Voucher invalid or expired');
       }
     } catch (error) {
-      setTicketError;
       toast.error('An unexpected error occurred');
+      setTicketError('An unexpected error occurred');
     } finally {
       setIsCreatingTicket(false);
     }
   };
-
-  const handlePurchase = () => {
+  
+  const handlePurchase = async () => {
+    await applyDiscount(); // Ensure discount is applied first
     handleTicketCreation();
-    applyDiscount();
-  }
-
+  };
+  
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
   const totalAmountBeforeDiscount = ticketPrice * ticketCount;
   const discountAmountInCurrency =
     (totalAmountBeforeDiscount * discountAmount) / 10;
   const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
   const totalPrice = finalAmount < 0 ? 0 : finalAmount;
-
   if (loading) return <p>Loading...</p>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
   if (!event) return <p>No event data</p>;
-
   const formatDate = (dateString: string) => {
     return moment(dateString).format('DD MMMM YYYY');
   };
-
   const formatTime24Hour = (dateString: string) => {
     const date = new Date(dateString);
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
   };
-
   return (
     <div className='flex justify-center items-center  w-full h-min-screen'>
       <div className='flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4'>
@@ -215,7 +206,6 @@ const DetailEvent = () => {
                 onChange={handleDiscountChange}
                 className="input input-bordered bg-slate-800"
               />
-              {isDiscountValid}
             </div>
             <div>
               <h1>Use Point (On Progress ... )</h1>
@@ -243,5 +233,4 @@ const DetailEvent = () => {
     </div>
   );
 };
-
 export default DetailEvent;

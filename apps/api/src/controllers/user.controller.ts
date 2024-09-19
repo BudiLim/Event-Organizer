@@ -148,9 +148,10 @@ export class UserController {
       // Create a discount voucher for the newly created user
       await prisma.discount.create({
         data: {
-          userId: user.id, // User ID of the newly created user
-          discountVoucher: 10, // 10% discount
-          validUntil: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Valid for 3 months
+          userId: user.id,
+          voucherCode: "WELCOME10",
+          discountVoucher: 10, 
+          validUntil: new Date(new Date().setMonth(new Date().getMonth() + 3)), 
         },
       });
 
