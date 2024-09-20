@@ -56,15 +56,20 @@ export class TicketService {
       throw new Error('Not enough available seats');
     }
 
+    //total harga ticket
     const priceBeforeDiscount = price * quantity;
     const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
     const priceAfterDiscount = priceBeforeDiscount - discountUnit;
+
+    //Ticket satuan
     const singleDiscountPrice = (price * discountAmount) / 100;
+    const pricePerTicketAfterDiscount = price - singleDiscountPrice;
+
     // Create tickets
     const ticketData = Array.from({ length: quantity }, () => ({
       eventId,
       userId,
-      price: event.price - singleDiscountPrice,
+      price: pricePerTicketAfterDiscount,
       status: Status.Active,
       purchaseDate: new Date(),
       quantity: 1,

@@ -17,6 +17,8 @@ import { TicketRouter } from './routers/ticket.router';
 import { PromotionRouter } from './routers/promotion.router';
 import { TransactionRouter } from './routers/transction.router';
 import { FeedbackRouter } from './routers/feedback.router'; // Import FeedbackRouter
+import { VoucherRouter } from './routers/voucher.router';
+import { PointsRouter } from './routers/point.router';
 
 export default class App {
   private app: Express;
@@ -75,6 +77,8 @@ export default class App {
     const ticketRouter = new TicketRouter();
     const promotionRouter = new PromotionRouter();
     const transactionRouter = new TransactionRouter();
+    const voucherRouter = new VoucherRouter();
+    const pointsRouter = new PointsRouter();
     const feedbackRouter = new FeedbackRouter(); // Use FeedbackRouter
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -88,7 +92,9 @@ export default class App {
     this.app.use('/api/event', eventRouter.getRouter());
     this.app.use('/api/transaction', transactionRouter.getRouter());
     this.app.use('/api/promotion', promotionRouter.getRouter());
-    this.app.use('/api/feedback', feedbackRouter.getRouter()); // Add feedback routes
+    this.app.use('/api/feedback', feedbackRouter.getRouter());
+    this.app.use('/api/voucher', voucherRouter.getRouter());
+    this.app.use('/api/points', pointsRouter.getRouter());
   }
 
   public start(): void {

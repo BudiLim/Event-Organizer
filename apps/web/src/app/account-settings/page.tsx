@@ -12,6 +12,7 @@ const AccountInfo = () => {
   const [newFirstName, setNewFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [newLastName, setNewLastName] = useState('');
+  const [userUniqueCode, setUserUniqueCode] = useState('');
   const [phone, setPhone] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -50,6 +51,7 @@ const AccountInfo = () => {
           setLastName(data.user.lastName);
           setPhone(data.user.phone);
           setEmail(data.user.email);
+          setUserUniqueCode(data.user.userUniqueCode);
         } else {
           toast.error(data.msg || 'Failed to fetch user data.');
         }
@@ -221,7 +223,13 @@ const AccountInfo = () => {
       <div style={contentStyle}>
         {selectedTab === 'contact' && (
           <div style={formContainerStyle}>
-            <h2 style={headingStyle}>Contact Info</h2>
+            <div className="flex justify-between">
+              <h2 style={headingStyle}>Contact Info</h2>
+            </div>
+            <h2 className="pb-3 text-right">
+              <span></span>
+              Your referral Code:{' '} <span className="text-xl font-bold hover:underline hover:link-hover text-blue-900">{userUniqueCode}</span>
+            </h2>
             <form>
               <label style={labelStyle}>
                 First Name :{' '}

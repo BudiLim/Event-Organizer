@@ -75,6 +75,7 @@ const Navbar = () => {
       <div className="hidden lg:flex h-full items-center gap-[30px]">
         {checkRole(Role.Experience) && (
           <div className="flex items-center">
+            <div>
             <div className="dropdown dropdown-hover">
               <div
                 tabIndex={1}
@@ -98,6 +99,7 @@ const Navbar = () => {
                 </li>
               </ul>
             </div>
+            </div>
           </div>
         )}
 
@@ -113,7 +115,7 @@ const Navbar = () => {
         {user.id ? (
           <div>
             {checkRole(Role.Organizer) && (
-              <div className="dropdown dropdown-end text-white">
+              <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}
                   role="button"
@@ -163,6 +165,9 @@ const Navbar = () => {
                     >
                       <li>
                         <Link href={'/my-ticket'}>My Ticket</Link>
+                      </li>
+                      <li>
+                        <Link href={'/my-promotion'}>Promotion</Link>
                       </li>
                       <li>
                         <Link href={'/account-settings'}>Account Setting</Link>
@@ -239,6 +244,12 @@ const Navbar = () => {
                 className="font-semibold text-white text-[15px] mb-4"
               >
                 My Ticket
+              </Link>
+              <Link
+                href="/my-promotion"
+                className="font-semibold text-white text-[15px] mb-4"
+              >
+                Promotion
               </Link>
               <Link
                 href="/account-settings"
