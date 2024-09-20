@@ -90,6 +90,8 @@ export interface TicketDetails {
   tickets: Ticket[];
   ticket: Ticket;
   event: Event;
+  voucher: Discount;
+  vouchers: Discount[];
 }
 
 export interface TicketPurchaseData {
@@ -101,8 +103,17 @@ export interface TicketPurchaseData {
 }
 
 export interface Discount {
+  id: number;
   userId: number;
   discountVoucher: number;
   voucherCode: string;
   validUntil: string;
+}
+
+export interface Points {
+  id: number;
+  userId: number;
+  points: number;
+  expiresAt: string;
+  expired: Boolean;
 }

@@ -9,25 +9,6 @@ import Link from 'next/link';
 import FeedbackForm from "../feedback/page";
 import FeedbackList from "../feedback-list/page";
 
-interface Event {
-  id: number;
-  name: string;
-  description: string;
-  location: string;
-  eventDate: string;
-  eventTime: string;
-  sellEndDate: string;
-  sellEndTime: string;
-  image: string;
-  price: number;
-  availableSeats: number;
-  isPaidEvent: string;
-  organizer: {
-    id: number;
-    name: string;
-  };
-}
-
 // Define available categories
 const categories = [
   { label: "All Categories", value: "" },

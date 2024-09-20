@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { verifyToken } from '@/middlewares/token';
+import { checkExperience, verifyToken } from '@/middlewares/token';
 import { PointsController } from '@/controllers/point.controller';
 
 export class PointsRouter {
@@ -14,8 +14,9 @@ export class PointsRouter {
 
   private initializeRoutes(): void {
     // Protected routes
-    this.router.post('/', verifyToken, this.pointsController.createPoints);
-    this.router.get('/:id/history', verifyToken, this.pointsController.getPointsHistory);
+    this.router.post('/', verifyToken, checkExperience, this.pointsController.createPoints);
+    this.router.get('/:id/history', verifyToken, checkExperience, this.pointsController.getPointsHistory);
+    this.router.get('/:userId/', verifyToken, checkExperience, this.pointsController.getMyPoints);
   }
 
   getRouter(): Router {

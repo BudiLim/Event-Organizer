@@ -33,9 +33,6 @@ export class UserController {
         });
       }
 
-      let referralOwnerName: string | null = null;
-      let referrerId: number | null = null;
-
       // Hash the password
       const salt = await genSalt(10);
       const hashPassword = await hash(password, salt);
@@ -43,82 +40,19 @@ export class UserController {
       // Generate a new unique code for the user
       const userUniqueCode = await generateReferralCode(firstName);
 
-      let user; // Declare user here so it is accessible in all blocks
-
-      if (referralCode) {
-        // Validate referral code if provided
-        const existingReferralCode = await prisma.user.findUnique({
-          where: { userUniqueCode: referralCode },
-        });
-
-        if (!existingReferralCode) {
-          return res.status(400).send({
-            status: 'error',
-            msg: 'Referral code is invalid!',
-          });
-        }
-
-        referralOwnerName = `${existingReferralCode.firstName} ${existingReferralCode.lastName}`;
-        referrerId = existingReferralCode.id;
-
-        // Create the new user with referral code
-        user = await prisma.user.create({
-          data: {
-            firstName,
-            lastName,
-            email,
-            password: hashPassword,
-            phone,
-            userType,
-            referralCode: referralCode || null, // Store referral code if provided
-            userUniqueCode,
-          },
-        });
-
-        // Add points to the referrer and update total points
-        const pointsToAward = 10000;
-
-        await prisma.user.update({
-          where: { id: referrerId },
-          data: {
-            points: {
-              increment: pointsToAward, // Increment referrer's total points
-            },
-          },
-        });
-
-        // Record point history
-        await prisma.points.create({
-          data: {
-            userId: referrerId,
-            points: pointsToAward,
-            expiresAt: new Date(new Date().setMonth(new Date().getMonth() + 3)), // Points expire in 3 months
-            expired: false,
-          },
-        });
-
-        // Record the referral usage
-        await prisma.referral.create({
-          data: {
-            referrerId: referrerId,
-            referredId: user.id,
-          },
-        });
-      } else {
-        // Create the user without referral code
-        user = await prisma.user.create({
-          data: {
-            firstName,
-            lastName,
-            email,
-            password: hashPassword,
-            phone,
-            userType,
-            referralCode: referralCode || null,
-            userUniqueCode,
-          },
-        });
-      }
+      // Create the new user with referral code
+      const user = await prisma.user.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          password: hashPassword,
+          phone,
+          userType,
+          referralCode: referralCode || null,
+          userUniqueCode,
+        },
+      });
 
       // Send verification email
       const payload = { id: user.id };
@@ -145,22 +79,11 @@ export class UserController {
         html: html,
       });
 
-      // Create a discount voucher for the newly created user
-      await prisma.discount.create({
-        data: {
-          userId: user.id,
-          voucherCode: "WELCOME10",
-          discountVoucher: 10, 
-          validUntil: new Date(new Date().setMonth(new Date().getMonth() + 3)), 
-        },
-      });
-
       // Send the response
       res.status(201).send({
         status: 'ok',
-        msg: 'Account created successfully!',
+        msg: 'Account created successfully! Please verify your email.',
         user,
-        referralOwnerName,
       });
     } catch (err) {
       console.error(err);
@@ -211,16 +134,80 @@ export class UserController {
       const user = await prisma.user.findUnique({
         where: { id: req.user?.id },
       });
-      if (user?.isActive) throw 'invalid link';
+
+      // Check if user is null or already verified
+      if (!user) {
+        return res.status(400).send({
+          status: 'error',
+          msg: 'User not found.',
+        });
+      }
+
+      if (user.isActive) {
+        throw 'Invalid link';
+      }
 
       await prisma.user.update({
         data: { isActive: true },
         where: { id: req.user?.id },
       });
 
+      // After successful verification, implement additional logic
+      if (user.referralCode) {
+        // Find the referrer using the referral code
+        const existingReferralCode = await prisma.user.findUnique({
+          where: { userUniqueCode: user.referralCode },
+        });
+
+        if (existingReferralCode) {
+          const referrerId = existingReferralCode.id;
+          const pointsToAward = 10000;
+
+          // Record point history
+          await prisma.points.create({
+            data: {
+              userId: referrerId,
+              points: pointsToAward,
+              expiresAt: new Date(
+                new Date().setMonth(new Date().getMonth() + 3),
+              ), // Points expire in 3 months
+              expired: false,
+            },
+          });
+
+          // Add points to the referrer and update total points
+          await prisma.user.update({
+            where: { id: referrerId },
+            data: {
+              points: {
+                increment: pointsToAward, // Increment referrer's total points
+              },
+            },
+          });
+
+          // Record the referral usage
+          await prisma.referral.create({
+            data: {
+              referrerId: referrerId,
+              referredId: user.id,
+            },
+          });
+        }
+      }
+
+      // Create a discount voucher for the newly created user
+      await prisma.discount.create({
+        data: {
+          userId: user.id,
+          voucherCode: 'WELCOME10',
+          discountVoucher: 10,
+          validUntil: new Date(new Date().setMonth(new Date().getMonth() + 3)),
+        },
+      });
+
       res.status(200).send({
         status: 'ok',
-        msg: 'success verify account !',
+        msg: 'Success verify account!',
       });
     } catch (err) {
       res.status(400).send({

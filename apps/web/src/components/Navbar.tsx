@@ -167,6 +167,9 @@ const Navbar = () => {
                         <Link href={'/my-ticket'}>My Ticket</Link>
                       </li>
                       <li>
+                        <Link href={'/my-promotion'}>Promotion</Link>
+                      </li>
+                      <li>
                         <Link href={'/account-settings'}>Account Setting</Link>
                       </li>
                       <li>
@@ -241,6 +244,12 @@ const Navbar = () => {
                 className="font-semibold text-white text-[15px] mb-4"
               >
                 My Ticket
+              </Link>
+              <Link
+                href="/my-promotion"
+                className="font-semibold text-white text-[15px] mb-4"
+              >
+                Promotion
               </Link>
               <Link
                 href="/account-settings"
