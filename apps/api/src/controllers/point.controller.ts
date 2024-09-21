@@ -89,4 +89,46 @@ export class PointsController {
       });
     }
   }
+
+  async getMyPoints(req: Request, res: Response) {
+    const pointsParam = req.params.userId;
+    const userId = parseInt(pointsParam, 10);
+
+    if (isNaN(userId)) {
+      return res.status(400).send({
+        status: 'error',
+        msg: 'Invalid user ID!',
+      });
+    }
+
+    try {
+      const pointsDetails = await prisma.points.findMany({
+        where: { userId },
+        select: {
+          id: true,
+          points: true,
+          expiresAt: true,
+          expired: true,
+        },
+    })
+
+      if (!pointsDetails) {
+        return res.status(404).send({
+          status: 'error',
+          msg: 'User not found!',
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: pointsDetails,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Unable to fetch ticket details',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
 }

@@ -124,9 +124,6 @@ export class TicketController {
     }
 
     try {
-      // Calculate total amount before discount
-      const totalAmountBeforeDiscount = price * quantity;
-
       // Initialize discountAmount
       let discountAmount = 0;
 
@@ -154,18 +151,17 @@ export class TicketController {
         discountAmount = discount.amount;
       }
 
-      // Calculate the final amount after discount
-      const amountDiscount = (totalAmountBeforeDiscount * discountAmount) / 100;
-      const finalAmount = totalAmountBeforeDiscount - amountDiscount;
-      const singleDiscount = (price * discountAmount) / 100;
-      const singlePrice = price - singleDiscount;
+      //total harga ticket
+      const priceBeforeDiscount = price * quantity;
+      const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
+      const priceAfterDiscount = priceBeforeDiscount - discountUnit;
 
       // Proceed with ticket creation
       const ticket = await TicketService.purchaseTicket({
         userId,
         eventId,
-        quantity: quantity,
-        price: singlePrice,
+        quantity,
+        price,
         discountCode,
       });
 
@@ -174,14 +170,14 @@ export class TicketController {
         data: {
           userId,
           eventId,
-          amount: finalAmount,
+          amount: priceAfterDiscount,
         },
       });
 
       return res.status(201).json({
         status: 'success',
         ticket,
-        finalAmount,
+        priceAfterDiscount,
       });
     } catch (error) {
       console.error('Error creating ticket:', error);

@@ -19,8 +19,10 @@ export default function VerifyPage() {
     }
 
     useEffect(() => {
-        onVerify()
-    }, [])
+        if (params.token) {
+            onVerify();
+        }
+    }, [params.token]);
     
     return (
         <div>

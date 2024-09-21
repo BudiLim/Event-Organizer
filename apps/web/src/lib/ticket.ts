@@ -51,7 +51,7 @@ export const createTicket = async (
   try {
     const token = await getToken();
     
-    const res = await fetch(`${base_url}/ticket`, {
+    const res = await fetch(`${base_url}/ticket/ticket`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -88,7 +88,7 @@ export interface ApplyDiscountResponse {
 
 export const applyDiscount = async (discountCode: string, eventId: number): Promise<ApplyDiscountResponse> => {
   try {
-    const response = await fetch(`http://localhost:8000/api/promotion/apply-discount`, {
+    const response = await fetch(`${base_url}/promotion/apply-discount`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

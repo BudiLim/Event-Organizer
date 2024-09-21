@@ -73,7 +73,39 @@ const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex h-full items-center gap-[30px]">
+<<<<<<< HEAD
         
+=======
+        {checkRole(Role.Experience) && (
+          <div className="flex items-center">
+            <div>
+            <div className="dropdown dropdown-hover">
+              <div
+                tabIndex={1}
+                role="button"
+                className="bg-transparent font-semibold text-[15px] text-white hover:scale-105"
+              >
+                Category
+              </div>
+              <ul
+                tabIndex={1}
+                className="dropdown-content menu bg-[#101010] text-white font-medium rounded-md w-[140px]"
+              >
+                <li>
+                  <Link href="/">Single Band</Link>
+                </li>
+                <li>
+                  <Link href="/">Group Band</Link>
+                </li>
+                <li>
+                  <Link href="/">Disc Jockey</Link>
+                </li>
+              </ul>
+            </div>
+            </div>
+          </div>
+        )}
+>>>>>>> 7e862e823b1b82fe19601bdc12884694ff3e9414
 
         {checkRole(Role.Organizer) && (
           <Link
@@ -87,7 +119,7 @@ const Navbar = () => {
         {user.id ? (
           <div>
             {checkRole(Role.Organizer) && (
-              <div className="dropdown dropdown-end text-white">
+              <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}
                   role="button"
@@ -137,6 +169,9 @@ const Navbar = () => {
                     >
                       <li>
                         <Link href={'/my-ticket'}>My Ticket</Link>
+                      </li>
+                      <li>
+                        <Link href={'/my-promotion'}>Promotion</Link>
                       </li>
                       <li>
                         <Link href={'/account-settings'}>Account Setting</Link>
@@ -213,6 +248,12 @@ const Navbar = () => {
                 className="font-semibold text-white text-[15px] mb-4"
               >
                 My Ticket
+              </Link>
+              <Link
+                href="/my-promotion"
+                className="font-semibold text-white text-[15px] mb-4"
+              >
+                Promotion
               </Link>
               <Link
                 href="/account-settings"
