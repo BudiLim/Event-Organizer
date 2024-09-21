@@ -6,23 +6,32 @@ import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
+import { useRouter } from 'next/navigation';
+
 
 const MyTicket = () => {
   const [data, setData] = useState<TicketDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
       const token = await getToken();
       if (!token) {
-        setError('No access token found');
-        setLoading(false);
+        router.push('/my-ticket')
         return;
       }
       try {
         // Decode the token to extract userId
         const decodedToken: DecodedToken = jwtDecode(token);
+
+        if(decodedToken.userType !== 'Experience') {
+          router.push('/unauthorized');
+          return
+        }
+
+
         const userId = decodedToken.id;
 
         const { result, ok } = await getMyTicketDetails(userId);
@@ -63,7 +72,7 @@ const MyTicket = () => {
   };
 
   return (
-    <section className="relative w-full flex flex-col items-center py-5 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8 bg-black text-white">
+    <section className="zrelative w-full flex flex-col items-center py-5 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8 bg-black text-white">
       <div className="w-full max-w-5xl bg-black text-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8">
         {/* Title */}
         <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-4 md:mb-6">

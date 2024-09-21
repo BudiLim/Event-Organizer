@@ -8,7 +8,6 @@ import moment from 'moment';
 import { toast } from 'react-toastify';
 import { Event } from '@/type/user';
 
-
 const DetailEvent = () => {
   const { id } = useParams();
 
@@ -22,6 +21,7 @@ const DetailEvent = () => {
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
+  const [value, setValue] = useState<number>(50); // Slider value
 
   useEffect(() => {
     if (id) {
@@ -96,13 +96,14 @@ const DetailEvent = () => {
     const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
     const totalAmountBeforeDiscount = ticketPrice * ticketCount;
     const discountAmountInCurrency =
-      (totalAmountBeforeDiscount * discountAmount) / 10;
+      (totalAmountBeforeDiscount * discountAmount) / 100;
     const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
     const totalPrice = finalAmount < 0 ? 0 : finalAmount;
     const singleDiscount = (event.price * discountAmount) / 100;
     const singlePrice = event.price - singleDiscount;
 
     try {
+      setIsCreatingTicket(true);
       const { result, ok } = await createTicket(
         event.id,
         singlePrice,
@@ -112,30 +113,28 @@ const DetailEvent = () => {
       );
 
       if (ok) {
+        setTicketSuccess('Ticket created successfully!');
         toast.success('Ticket created successfully!');
-        setTicketSuccess;
       } else {
-        toast.error(result?.message || 'Failed! Maybe Voucher invalid or expired');
+        setTicketError(result?.message || 'Failed! Voucher may be invalid or expired');
+        toast.error(result?.message || 'Failed! Voucher may be invalid or expired');
       }
     } catch (error) {
-      setTicketError;
+      setTicketError('An unexpected error occurred');
       toast.error('An unexpected error occurred');
     } finally {
       setIsCreatingTicket(false);
     }
   };
 
-  const handlePurchase = () => {
-    handleTicketCreation();
-    applyDiscount();
-  }
+  const handlePurchase = async () => {
+    await applyDiscount(); // Apply discount first
+    handleTicketCreation(); // Then create ticket
+  };
 
-  const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
-  const totalAmountBeforeDiscount = ticketPrice * ticketCount;
-  const discountAmountInCurrency =
-    (totalAmountBeforeDiscount * discountAmount) / 10;
-  const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
-  const totalPrice = finalAmount < 0 ? 0 : finalAmount;
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(parseInt(e.target.value)); // Handle slider value
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
@@ -152,8 +151,15 @@ const DetailEvent = () => {
     return `${hours}:${minutes}`;
   };
 
+  const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
+  const totalAmountBeforeDiscount = ticketPrice * ticketCount;
+  const discountAmountInCurrency =
+    (totalAmountBeforeDiscount * discountAmount) / 100;
+  const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
+  const totalPrice = finalAmount < 0 ? 0 : finalAmount;
+
   return (
-    <div className='flex justify-center items-center  w-full h-min-screen'>
+    <div className='flex justify-center items-center w-full min-h-screen'>
       <div className='flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4'>
         <div className='shadow-sm shadow-white rounded-lg'>
           {event.image ? (
@@ -185,14 +191,13 @@ const DetailEvent = () => {
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">Category</h1>
-              <p className="text-[#d9d9d9]">{event.category.toLocaleLowerCase()}</p> {/* Updated from Organizer to Category */}
+              <p className="text-[#d9d9d9]">{event.category.toLowerCase()}</p>
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">General Admission</h1>
               <div className="flex justify-between w-full">
                 <h1>
-                  Rp.{' '}
-                  {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
+                  Rp.{' '}{(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
                 </h1>
                 <div className="flex items-center gap-3">
                   <FiMinusCircle onClick={minusCount} size={26} />
@@ -206,38 +211,34 @@ const DetailEvent = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-2 text-white font-normal">
-              <h1>Discount Voucher</h1>
-              <input
-                type="text"
-                placeholder="Discount Code Here"
-                value={discountCode.toUpperCase()}
-                onChange={handleDiscountChange}
-                className="input input-bordered bg-slate-800"
-              />
-              {isDiscountValid}
-            </div>
-            <div>
-              <h1>Use Point (On Progress ... )</h1>
-            <input type="range" min={0} max="100" value="40" className="range range-primary" />
+            <div className="text-extrathin text-lg">
+              <h1 className="font-semibold">Use Point</h1>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={value}
+                  onChange={handleSliderChange}
+                  className="w-full"
+                />
+                <span className="text-white">{value}%</span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 items-center">
-            <h1 className="font-bold pr-4">
-              Total: Rp.{' '}
-              {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
-              ,-
-            </h1>
-            <button
-              onClick={handlePurchase}
-              disabled={isCreatingTicket}
-              className="bg-blue-700 p-2 rounded-lg"
-            >
-              {isCreatingTicket ? 'Processing...' : 'Check Out'}
-            </button>
-            {ticketError && <p className="text-red-500">{ticketError}</p>}
-            {ticketSuccess && <p className="text-green-500">{ticketSuccess}</p>}
-          </div>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-lg"
+            onClick={handlePurchase}
+            disabled={isCreatingTicket}
+          >
+            {isCreatingTicket ? 'Processing...' : 'Buy Ticket'}
+          </button>
+          {ticketError && (
+            <p className="text-red-500">{ticketError}</p>
+          )}
+          {ticketSuccess && (
+            <p className="text-green-500">{ticketSuccess}</p>
+          )}
         </div>
       </div>
     </div>

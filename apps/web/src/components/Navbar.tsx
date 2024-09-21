@@ -73,33 +73,7 @@ const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex h-full items-center gap-[30px]">
-        {checkRole(Role.Experience) && (
-          <div className="flex items-center">
-            <div className="dropdown dropdown-hover">
-              <div
-                tabIndex={1}
-                role="button"
-                className="bg-transparent font-semibold text-[15px] text-white hover:scale-105"
-              >
-                Category
-              </div>
-              <ul
-                tabIndex={1}
-                className="dropdown-content menu bg-[#101010] text-white font-medium rounded-md w-[140px]"
-              >
-                <li>
-                  <Link href="/">Single Band</Link>
-                </li>
-                <li>
-                  <Link href="/">Group Band</Link>
-                </li>
-                <li>
-                  <Link href="/">Disc Jockey</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
+        
 
         {checkRole(Role.Organizer) && (
           <Link

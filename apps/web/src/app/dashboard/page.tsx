@@ -3,12 +3,15 @@ import { getOrganizerDashboardData } from '@/lib/dashboard';
 import { getToken } from '@/lib/server';
 import { DashboardData, DecodedToken } from '@/type/user';
 import { jwtDecode } from 'jwt-decode';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import MyLineChart from '../chart/page';
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const [dateRange, setDateRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -20,12 +23,17 @@ const Dashboard = () => {
       if (!token) {
         setError('Token is missing');
         setLoading(false);
+        router.push('/login');
         return;
       }
 
       try {
         // Decode the token to extract organizerId
         const decodedToken: DecodedToken = jwtDecode(token);
+        if (decodedToken.userType !== 'Organizer') {
+          router.push('/unauthorized'); // Redirect to an unauthorized page
+          return;
+        }
         const organizerId = decodedToken.id;
 
         const { result, ok } = await getOrganizerDashboardData(
@@ -143,6 +151,7 @@ const Dashboard = () => {
 
         
         {/* Chart component will go here in future */}
+        <MyLineChart/>
 
 
         <div className="h-64 bg-gray-200 flex items-center justify-center">
