@@ -68,9 +68,10 @@ export interface DashboardData {
   totalOrders: number;
   totalTicketsSold: number;
   events: Event[];
-  previousWeekRevenue: number; // Added field for comparison
-  previousWeekTicketsSold: number; // Added field for comparison
-  previousWeekOrders: number;
+  previousWeekRevenue: number; // For comparison
+  previousWeekTicketsSold: number; // For comparison
+  previousWeekOrders: number; // For comparison
+  monthlyRevenue: { month: number; revenue: number }[]; // Changed to reflect the monthly data structure
 }
 
 export interface Ticket {
@@ -116,4 +117,8 @@ export interface Points {
   points: number;
   expiresAt: string;
   expired: Boolean;
+}
+
+export interface JwtPayload {
+  id: string;
 }

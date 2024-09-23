@@ -236,23 +236,40 @@ export class UserController {
 
   async getUserId(req: Request, res: Response) {
     try {
+      const userId = parseInt(req.params.id, 10); // Safely convert the ID to an integer
+      if (isNaN(userId)) {
+        return res.status(400).send({
+          status: 'error',
+          msg: 'Invalid user ID',
+        });
+      }
+  
       const user = await prisma.user.findUnique({
-        where: { id: +req.params.id },
+        where: { id: userId }, // Using the converted integer
       });
-      if (!user) throw 'Account not found!';
+  
+      if (!user) {
+        return res.status(404).send({
+          status: 'error',
+          msg: 'Account not found!',
+        });
+      }
+  
       res.status(200).send({
         status: 'ok',
         msg: 'Account fetched!',
         user,
       });
     } catch (err) {
-      console.error(err);
-      res.status(400).send({
+      console.error('Error fetching user:', err);
+      res.status(500).send({
         status: 'error',
-        msg: err,
+        msg: 'Internal server error',
+        error: err || err,
       });
     }
   }
+  
 
   async updateUser(req: Request, res: Response) {
     try {
@@ -314,4 +331,32 @@ export class UserController {
       });
     }
   }
+
+  async updateUserPoints(userId: number) {
+    try {
+      // Calculate the total points for the user, considering only non-expired points
+      const totalPoints = await prisma.points.aggregate({
+        _sum: {
+          points: true,
+        },
+        where: {
+          userId,
+          expiresAt: {
+            gte: new Date(), // Only consider points that are not expired
+          },
+        },
+      });
+  
+      // Update the user's points field
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          points: totalPoints._sum.points || 0,
+        },
+      });
+    } catch (err) {
+      console.error('Error updating user points:', err);
+    }
+  }
+  
 }

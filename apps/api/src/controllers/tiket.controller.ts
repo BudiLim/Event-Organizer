@@ -116,7 +116,7 @@ export class TicketController {
   }
 
   async createTicket(req: Request, res: Response) {
-    const { eventId, quantity, price, discountCode } = req.body;
+    const { eventId, quantity, price, discountCode, pointsToRedeem } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -151,10 +151,20 @@ export class TicketController {
         discountAmount = discount.amount;
       }
 
-      //total harga ticket
+      // Calculate total price before discounts
       const priceBeforeDiscount = price * quantity;
       const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
-      const priceAfterDiscount = priceBeforeDiscount - discountUnit;
+      let priceAfterDiscount = priceBeforeDiscount - discountUnit;
+
+      // Handle points to redeem
+      if (pointsToRedeem) {
+        const pointsValue = 100; // Define the value of each point
+        const totalPointsValue = pointsToRedeem * pointsValue;
+
+        // Deduct points value from price
+        priceAfterDiscount -= totalPointsValue;
+        priceAfterDiscount = priceAfterDiscount < 0 ? 0 : priceAfterDiscount; // Ensure it doesn't go negative
+      }
 
       // Proceed with ticket creation
       const ticket = await TicketService.purchaseTicket({
@@ -163,6 +173,7 @@ export class TicketController {
         quantity,
         price,
         discountCode,
+        
       });
 
       // Record the transaction with the final amount
