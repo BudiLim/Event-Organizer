@@ -109,24 +109,18 @@ export const applyDiscount = async (discountCode: string, eventId: number): Prom
 };
 
 export const getUserPoints = async (userId: string) => {
-  const token = await getToken();  // Ensure token is retrieved for authenticated API requests
+  const token = await getToken();
 
   const res = await fetch(`${base_url}/points/${userId}`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${token}`,  // Include token for authorization
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     cache: 'no-cache',
   });
 
   const result = await res.json();
-
-  if (res.ok) {
-    // Return the successful result, with points and expiration date
-    return { totalPoints: result.totalPoints, nearestExpiration: result.nearestExpiration };
-  } else {
-    console.error('Error fetching points:', result.msg);
-    return { totalPoints: 0, nearestExpiration: null };
-  }
+  
+  return { result, ok: res.ok };
 };

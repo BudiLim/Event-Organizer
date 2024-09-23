@@ -90,7 +90,7 @@ export class PointsController {
     }
   }
 
-  async getUserPoints(req: Request, res: Response) {
+  async getMyPoints(req: Request, res: Response) {
     const pointsParam = req.params.userId;
     const userId = parseInt(pointsParam, 10);
 
@@ -102,55 +102,35 @@ export class PointsController {
     }
 
     try {
-      // Aggregate the sum of points for the user, excluding expired ones
-      const pointsAggregate = await prisma.points.aggregate({
-        _sum: {
+      const pointsDetails = await prisma.points.findMany({
+        where: { userId },
+        select: {
+          id: true,
           points: true,
+          expiresAt: true,
+          expired: true,
         },
-        where: {
-          userId: userId,
-          expiresAt: {
-            gte: new Date(), // Only include non-expired points
-          },
-        },
-      });
+    })
 
-      const totalPoints = pointsAggregate._sum.points || 0;
-
-      if (totalPoints === 0) {
+      if (!pointsDetails) {
         return res.status(404).send({
           status: 'error',
-          msg: 'No valid points found for the user!',
+          msg: 'User not found!',
         });
       }
 
-      // Fetch points with nearest expiration date
-      const nearestExpirationPoint = await prisma.points.findFirst({
-        where: {
-          userId: userId,
-          expiresAt: {
-            gte: new Date(),
-          },
-        },
-        orderBy: {
-          expiresAt: 'asc', // Order by nearest expiration date
-        },
-      });
-
       return res.status(200).json({
         status: 'success',
-        totalPoints: totalPoints,
-        nearestExpiration: nearestExpirationPoint?.expiresAt,
+        data: pointsDetails,
       });
     } catch (error) {
       return res.status(500).json({
         status: 'error',
-        message: 'Unable to fetch points details',
+        message: 'Unable to fetch ticket details',
         details: error instanceof Error ? error.message : String(error),
       });
     }
   }
-
 
   async usePoints(req: Request, res: Response) {
     try {
