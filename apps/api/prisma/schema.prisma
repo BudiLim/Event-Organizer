@@ -73,6 +73,7 @@ model Event {
   promotions  Promotion[]
   reviews     Review[]
   Transaction Transaction[]
+  Feedback    Feedback[]
 }
 
 enum Status {
@@ -183,4 +184,8 @@ model Feedback {
   id        Int      @id @default(autoincrement())
   message   String
   createdAt DateTime @default(now())
+  eventId   Int
+
+  //relation
+  event Event @relation(fields: [eventId], references: [id])
 }

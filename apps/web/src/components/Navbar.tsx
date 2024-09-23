@@ -73,9 +73,6 @@ const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex h-full items-center gap-[30px]">
-<<<<<<< HEAD
-        
-=======
         {checkRole(Role.Experience) && (
           <div className="flex items-center">
             <div>
@@ -105,7 +102,6 @@ const Navbar = () => {
             </div>
           </div>
         )}
->>>>>>> 7e862e823b1b82fe19601bdc12884694ff3e9414
 
         {checkRole(Role.Organizer) && (
           <Link

@@ -7,6 +7,8 @@ import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 import { Event } from '@/type/user';
+import FeedbackForm from '@/app/feedback/page';
+import FeedbackList from '@/app/feedback-list/page';
 
 const DetailEvent = () => {
   const { id } = useParams();
@@ -146,7 +148,7 @@ const DetailEvent = () => {
     return `${hours}:${minutes}`;
   };
   return (
-    <div className='flex justify-center items-center w-full min-h-screen'>
+    <div className='flex flex-col justify-center items-center w-full min-h-screen'>
       <div className='flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4'>
         <div className='shadow-sm shadow-white rounded-lg'>
           {event.image ? (
@@ -228,6 +230,8 @@ const DetailEvent = () => {
           )}
         </div>
       </div>
+      <FeedbackForm eventId={`${id}`}/>
+      <FeedbackList eventId={`${id}`}/>
     </div>
   );
 };

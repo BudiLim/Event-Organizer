@@ -1,71 +1,62 @@
-// components/FeedbackForm.tsx
+'use client';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-'use client'
-import { useState } from 'react';
-import { toast } from 'react-toastify';
+interface FeedbackFormProps {
+  eventId: number | string; // Adjust type based on your needs
+}
 
-const FeedbackForm = () => {
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+const FeedbackForm: React.FC<FeedbackFormProps> = ({ eventId }) => {
+  const [message, setMessage] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
-    if (!message.trim()) {
+    if (!message) {
       setError('Message is required');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/feedback/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message }),
+      const response = await axios.post('http://localhost:8000/api/feedback', {
+        message,
+        eventId,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast.success('Feedback submitted successfully!', {
-          position: 'bottom-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+      setSuccess('Feedback submitted successfully');
+      setMessage('');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.msg || 'An error occurred');
       } else {
-        const errorData = await response.json();
-        setError(`Error: ${errorData.msg}`);
+        setError('An unexpected error occurred');
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred while submitting feedback');
     }
   };
 
   return (
-    <div className="w-full p-2 md:p-4 lg:p-8">
-      <h1 className="text-2xl font-semibold mb-4">Submit Feedback</h1>
+    <div className="w-full mx-auto p-4 sm:p-6 md:p-8">
+      <h2 className="text-2xl font-semibold mb-4 sm:text-3xl">Leave Feedback</h2>
       <form onSubmit={handleSubmit}>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={4}
-          className="w-full p-2 border border-gray-300 rounded-md bg-black bg-opacity-50 text-white placeholder-gray-400 mb-4 resize-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter your feedback here..."
+          className="w-full p-2 border rounded mb-2 resize-none"
+          placeholder="Your feedback..."
+          required
         />
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className='flex justify-center '>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {success && <p className="text-green-500 text-sm">{success}</p>}
         <button
           type="submit"
-          className="flex justify-center w-1/5 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
         >
-          Submit
+          Submit Feedback
         </button>
-        </div>
       </form>
     </div>
   );

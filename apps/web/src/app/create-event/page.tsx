@@ -38,6 +38,11 @@ const CreateEvent = () => {
         const decodedToken:DecodedToken = jwtDecode(token);
         if (decodedToken.userType !== 'Organizer') {
           router.push('/unauthorized')
+        } else {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            organizerId: decodedToken.id
+          }))
         }
       }
     };
@@ -263,18 +268,6 @@ const CreateEvent = () => {
             />
           </div>
         )}
-
-        <div>
-          <label className="block mb-2">Organizer ID</label>
-          <input
-            type="text"
-            name="organizerId"
-            value={formData.organizerId}
-            onChange={handleInputChange}
-            className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-            required
-          />
-        </div>
 
         {formData.isPaidEvent === 'Paid' && (
         <>
