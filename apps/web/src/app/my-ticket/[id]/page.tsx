@@ -8,6 +8,7 @@ import { getTicketId } from '@/lib/ticket';
 import moment from 'moment';
 import afgan from '@/assets/afgan.png';
 import Image from 'next/image';
+import { event } from 'cypress/types/jquery';
 
 const TicketDetailsPage = ({ params }: { params: { id: string } }) => {
   const [data, setData] = useState<TicketDetails | null>(null);
@@ -116,7 +117,7 @@ const TicketDetailsPage = ({ params }: { params: { id: string } }) => {
             <div className="mb-4">
               <h2 className="text-lg font-semibold">Ticket Price</h2>
               <div className="bg-gray-800 text-gray-200 rounded-md px-4 py-2">
-                {data?.event.price ? formatPrice(data.event.price) : 'No price available'}
+                {data?.event.price ? formatPrice(data.event?.price) : 'No price available'}
               </div>
             </div>
           </div>

@@ -8,7 +8,6 @@ import moment from 'moment';
 import { toast } from 'react-toastify';
 import { Event } from '@/type/user';
 
-
 const DetailEvent = () => {
   const { id } = useParams();
   const [event, setEvent] = useState<Event | null>(null);
@@ -21,26 +20,40 @@ const DetailEvent = () => {
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
+  const [value, setValue] = useState<number | null>(null);
+  const [userPoints, setUserPoints] = useState(0);
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
 
-  
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch event data
+        const eventResponse = await fetch(
+          `http://localhost:8000/api/event/${id}`,
+        );
+        if (!eventResponse.ok) throw new Error('Failed to fetch event');
+        const eventData = await eventResponse.json();
+        setEvent(eventData.event);
+
+        // Fetch user points
+        const pointsResponse = await fetch(
+          `http://localhost:8000/api/user/points`,
+        );
+        const pointsData = await pointsResponse.json();
+        setUserPoints(pointsData.points);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to load event details or user points');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (id) {
-      const fetchEvent = async () => {
-        try {
-          const response = await fetch(`http://localhost:8000/api/event/${id}`);
-          if (!response.ok) throw new Error('Failed to fetch event');
-          const data = await response.json();
-          setEvent(data.event);
-        } catch (error) {
-          console.error('Error fetching event:', error);
-          setError('Failed to load event details');
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchEvent();
+      fetchData();
     }
   }, [id]);
+
   const plusCount = () => {
     if (ticketCount < 100) setTicketCount((prev) => prev + 1);
   };
@@ -54,6 +67,12 @@ const DetailEvent = () => {
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiscountCode(e.target.value);
   };
+
+  const handleSlideChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Math.max(0, Math.min(userPoints, parseInt(e.target.value) || 0));
+    setPointsToRedeem(value);
+};
+
   const applyDiscount = async () => {
     if (!discountCode || !event?.id) return;
     try {
@@ -65,7 +84,7 @@ const DetailEvent = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ discountCode, eventId: event.id }),
-        }
+        },
       );
       const result = await response.json();
       if (response.ok && result.discount) {
@@ -81,36 +100,50 @@ const DetailEvent = () => {
       setDiscountAmount(0);
     }
   };
-  
+
   const handleTicketCreation = async () => {
     if (!event) return;
     const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
     const totalAmountBeforeDiscount = ticketPrice * ticketCount;
-    const discountAmountInCurrency = (totalAmountBeforeDiscount * discountAmount) / 100;
-  
+    const discountAmountInCurrency =
+  (totalAmountBeforeDiscount * (discountAmount || 0)) / 100;
+
+  const pointsValue = pointsToRedeem || 0; // Default to 0 if pointsToRedeem is falsy
+  const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency - pointsValue;
+  const totalPrice = Math.max(finalAmount, 0); // Ensure no negative total price
+
+
+  console.log('Total Amount Before Discount:', totalAmountBeforeDiscount);
+    console.log('Discount Amount in Currency:', discountAmountInCurrency);
+    console.log('Points Value:', pointsValue);
+    console.log('Final Amount:', finalAmount);
+
     setIsCreatingTicket(true);
     setTicketError(null);
     setTicketSuccess(null);
-  
-    const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency;
-    const totalPrice = finalAmount < 0 ? 0 : finalAmount;
+
     const singleDiscount = (event.price * discountAmount) / 100;
     const singlePrice = event.price - singleDiscount;
-  
+
     try {
       const { result, ok } = await createTicket(
         event.id,
         singlePrice,
         ticketCount,
         totalPrice,
-        discountCode
+        discountCode,
+        pointsToRedeem,
       );
       if (ok) {
         toast.success('Ticket created successfully!');
         setTicketSuccess('Ticket created successfully!');
       } else {
-        toast.error(result?.message || 'Failed! Maybe Voucher invalid or expired');
-        setTicketError(result?.message || 'Failed! Maybe Voucher invalid or expired');
+        toast.error(
+          result?.message || 'Failed! Maybe Voucher invalid or expired',
+        );
+        setTicketError(
+          result?.message || 'Failed! Maybe Voucher invalid or expired',
+        );
       }
     } catch (error) {
       toast.error('An unexpected error occurred');
@@ -119,12 +152,17 @@ const DetailEvent = () => {
       setIsCreatingTicket(false);
     }
   };
-  
+
   const handlePurchase = async () => {
-    await applyDiscount(); // Ensure discount is applied first
-    handleTicketCreation();
+    await applyDiscount();
+    if (pointsToRedeem > userPoints) {
+      toast.error('You do not have enough points to redeem.');
+      return;
+    }
+    // Proceed to create the ticket
+    await handleTicketCreation();
   };
-  
+
   const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
   const totalAmountBeforeDiscount = ticketPrice * ticketCount;
   const discountAmountInCurrency =
@@ -144,9 +182,9 @@ const DetailEvent = () => {
     return `${hours}:${minutes}`;
   };
   return (
-    <div className='flex justify-center items-center  w-full h-min-screen'>
-      <div className='flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4'>
-        <div className='shadow-sm shadow-white rounded-lg'>
+    <div className="flex justify-center items-center  w-full h-min-screen">
+      <div className="flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4">
+        <div className="shadow-sm shadow-white rounded-lg">
           {event.image ? (
             <Image
               src={event.image}
@@ -176,7 +214,10 @@ const DetailEvent = () => {
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">Category</h1>
-              <p className="text-[#d9d9d9]">{event.category.toLocaleLowerCase()}</p> {/* Updated from Organizer to Category */}
+              <p className="text-[#d9d9d9]">
+                {event.category.toLocaleLowerCase()}
+              </p>{' '}
+              {/* Updated from Organizer to Category */}
             </div>
             <div className="text-extrathin text-lg">
               <h1 className="font-semibold">General Admission</h1>
@@ -207,9 +248,18 @@ const DetailEvent = () => {
                 className="input input-bordered bg-slate-800"
               />
             </div>
+            {/* Redeem points section */}
             <div>
-              <h1>Use Point (On Progress ... )</h1>
-            <input type="range" min={0} max="100" value="40" className="range range-primary" />
+              <h1 className="text-center">Redeem Point</h1>
+              <input
+                type="range"
+                min={0}
+                max={userPoints}
+                value={pointsToRedeem}
+                onChange={handleSlideChange}
+                className="range range-primary"
+              />
+              <p>{pointsToRedeem} points will be redeemed</p>
             </div>
           </div>
           <div className="flex flex-col gap-2 items-center">

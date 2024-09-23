@@ -32,12 +32,14 @@ export class TicketService {
     quantity,
     price,
     discountCode,
+    pointsToRedeem,
   }: {
     userId: number;
     eventId: number;
     quantity: number;
     price: number;
     discountCode?: string;
+    pointsToRedeem?: number;
   }) {
     let discountAmount = 0;
     if (discountCode) {
@@ -56,14 +58,23 @@ export class TicketService {
       throw new Error('Not enough available seats');
     }
 
-    //total harga ticket
+    // Total ticket price
     const priceBeforeDiscount = price * quantity;
     const discountUnit = (priceBeforeDiscount * discountAmount) / 100;
-    const priceAfterDiscount = priceBeforeDiscount - discountUnit;
+    let priceAfterDiscount = priceBeforeDiscount - discountUnit;
 
-    //Ticket satuan
+    // Ticket satuan
     const singleDiscountPrice = (price * discountAmount) / 100;
     const pricePerTicketAfterDiscount = price - singleDiscountPrice;
+
+    // Apply points redemption if provided
+    if (pointsToRedeem) {
+      const pointsValue = pointsToRedeem;
+      priceAfterDiscount -= pointsValue;
+
+      // Ensure the final price is not negative
+      priceAfterDiscount = Math.max(priceAfterDiscount, 0);
+    }
 
     // Create tickets
     const ticketData = Array.from({ length: quantity }, () => ({
