@@ -15,14 +15,18 @@ const DetailEvent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [discountCode, setDiscountCode] = useState('');
+  const [voucherCode, setVoucherCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [voucherAmount, setVoucherAmount] = useState(0);
   const [isDiscountValid, setIsDiscountValid] = useState<boolean | null>(null);
+  const [isVoucherValid, setIsVoucherValid] = useState<boolean | null>(null);
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
   const [value, setValue] = useState<number | null>(null);
   const [userPoints, setUserPoints] = useState(0);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
+  const [codeType, setCodeType] = useState<'voucher' | 'discount' | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,16 +72,24 @@ const DetailEvent = () => {
     setDiscountCode(e.target.value);
   };
 
+  const handleVoucherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVoucherCode(e.target.value);
+  };
+  
+
   const handleSlideChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(0, Math.min(userPoints, parseInt(e.target.value) || 0));
+    const value = Math.max(
+      0,
+      Math.min(userPoints, parseInt(e.target.value) || 0),
+    );
     setPointsToRedeem(value);
-};
+  };
 
   const applyDiscount = async () => {
     if (!discountCode || !event?.id) return;
     try {
       const response = await fetch(
-        `http://localhost:8000/api/promotion/discount-code`,
+        `http://localhost:8000/api/promotion/apply-discount-code`,
         {
           method: 'POST',
           headers: {
@@ -101,22 +113,47 @@ const DetailEvent = () => {
     }
   };
 
+  const applyVoucher = async () => {
+    if (!voucherCode || !event?.discount.userId) return;
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/promotion/apply-voucher-code`, // Update this with the correct endpoint
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ voucherCode, userId: event.discount.userId }),
+        },
+      );
+      const result = await response.json();
+      if (response.ok && result.voucher) {
+        setVoucherAmount(result.voucher.amount.percentage);
+        setIsVoucherValid(true);
+      } else {
+        console.error('Voucher error:', result);
+        setIsVoucherValid(false);
+        setVoucherAmount(0);
+      }
+    } catch (error) {
+      console.error('Error applying voucher:', error);
+      setIsVoucherValid(false);
+      setVoucherAmount(0);
+    }
+  };
+  
+
   const handleTicketCreation = async () => {
     if (!event) return;
     const ticketPrice = event?.isPaidEvent === 'Paid' ? event.price : 0;
     const totalAmountBeforeDiscount = ticketPrice * ticketCount;
     const discountAmountInCurrency =
-  (totalAmountBeforeDiscount * (discountAmount || 0)) / 100;
+      (totalAmountBeforeDiscount * (discountAmount || 0)) / 100;
 
-  const pointsValue = pointsToRedeem || 0; // Default to 0 if pointsToRedeem is falsy
-  const finalAmount = totalAmountBeforeDiscount - discountAmountInCurrency - pointsValue;
-  const totalPrice = Math.max(finalAmount, 0); // Ensure no negative total price
-
-
-  console.log('Total Amount Before Discount:', totalAmountBeforeDiscount);
-    console.log('Discount Amount in Currency:', discountAmountInCurrency);
-    console.log('Points Value:', pointsValue);
-    console.log('Final Amount:', finalAmount);
+    const pointsValue = pointsToRedeem || 0; // Default to 0 if pointsToRedeem is falsy
+    const finalAmount =
+      totalAmountBeforeDiscount - discountAmountInCurrency - voucherAmount - pointsValue;
+    const totalPrice = Math.max(finalAmount, 0); // Ensure no negative total price
 
     setIsCreatingTicket(true);
     setTicketError(null);
@@ -154,11 +191,23 @@ const DetailEvent = () => {
   };
 
   const handlePurchase = async () => {
-    await applyDiscount();
+    // Show confirmation popup
+    const confirmed = window.confirm(
+      'Are you sure you want to proceed with the purchase?',
+    );
+
+    if (!confirmed) {
+      return; // User canceled, do not proceed
+    }
+
+    await applyDiscount()
+    await applyVoucher();
+
     if (pointsToRedeem > userPoints) {
       toast.error('You do not have enough points to redeem.');
       return;
     }
+
     // Proceed to create the ticket
     await handleTicketCreation();
   };
@@ -243,7 +292,7 @@ const DetailEvent = () => {
               <input
                 type="text"
                 placeholder="Discount Code Here"
-                value={discountCode.toUpperCase()}
+                value={(discountCode || voucherCode).toUpperCase()}
                 onChange={handleDiscountChange}
                 className="input input-bordered bg-slate-800"
               />

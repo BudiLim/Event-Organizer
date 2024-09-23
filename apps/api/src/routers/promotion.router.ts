@@ -13,7 +13,9 @@ export class PromotionRouter {
 
   private initializeRoutes(): void {
     this.router.post('/apply-discount', this.promotionController.applyDiscount.bind(this.promotionController));
-    this.router.post('/discount-code', this.promotionController.applyDiscount);
+    this.router.post('/apply-voucher-code', this.promotionController.applyVoucher.bind(this.promotionController));
+    // this.router.post('/discount-code', this.promotionController.applyDiscount);
+    // this.router.post('/voucher-code/:userId', this.promotionController.applyVoucher);
   }
 
   getRouter(): Router {
