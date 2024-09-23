@@ -10,7 +10,7 @@ const MyLineChart = () => {
   const labels = ["Jan", "Feb", "Mar", "April", "May", "June", "July", "Aug"];
 
   // Data want to show on chart
-  const datasets = [12, 45, 67, 43, 89, 34, 67, 43];
+  const datasets = [20, 45, 67, 43, 89, 34, 67, 43];
 
   const data = {
     labels: labels,

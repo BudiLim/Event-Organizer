@@ -1,5 +1,6 @@
+// feedback.router.ts
 import { Router } from 'express';
-import { FeedbackController } from '@/controllers/feedback.controller';
+import { FeedbackController } from '@/controllers/feedback.controller'; 
 
 export class FeedbackRouter {
   private router: Router;
@@ -12,8 +13,9 @@ export class FeedbackRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/create', this.feedbackController.createFeedback.bind(this.feedbackController));
-    this.router.get('/', this.feedbackController.getFeedback.bind(this.feedbackController));
+    // Public routes
+    this.router.post('/', this.feedbackController.createFeedback.bind(this.feedbackController)); // Create feedback
+    this.router.get('/:eventId', this.feedbackController.getFeedbackForEvent.bind(this.feedbackController)); // Get feedback for an event
   }
 
   getRouter(): Router {
