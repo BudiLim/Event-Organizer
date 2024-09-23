@@ -16,9 +16,9 @@ import { DashboardRouter } from './routers/dashboard.router';
 import { TicketRouter } from './routers/ticket.router';
 import { PromotionRouter } from './routers/promotion.router';
 import { TransactionRouter } from './routers/transction.router';
-import { FeedbackRouter } from './routers/feedback.router'; // Import FeedbackRouter
 import { VoucherRouter } from './routers/voucher.router';
 import { PointsRouter } from './routers/point.router';
+import { FeedbackRouter } from './routers/feedback.router';
 
 export default class App {
   private app: Express;
@@ -79,7 +79,7 @@ export default class App {
     const transactionRouter = new TransactionRouter();
     const voucherRouter = new VoucherRouter();
     const pointsRouter = new PointsRouter();
-    const feedbackRouter = new FeedbackRouter(); // Use FeedbackRouter
+    const feedbackRouter = new FeedbackRouter(); 
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);

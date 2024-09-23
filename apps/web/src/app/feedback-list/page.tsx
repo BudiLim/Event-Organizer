@@ -1,6 +1,6 @@
 // components/FeedbackList.tsx
 
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
 
 interface Feedback {
@@ -9,17 +9,21 @@ interface Feedback {
   createdAt: string;
 }
 
-const FeedbackList = () => {
+interface FeedbackListProps {
+  eventId: number | string; // Adjust type as needed
+}
+
+const FeedbackList: React.FC<FeedbackListProps> = ({ eventId }) => {
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/feedback');
+        const response = await fetch(`http://localhost:8000/api/feedback/${eventId}`);
         if (response.ok) {
           const data = await response.json();
-          setFeedbackList(data.feedbackList);
+          setFeedbackList(data.feedback); // Adjust based on your actual response structure
           setError('');
         } else {
           const errorData = await response.json();
@@ -31,7 +35,7 @@ const FeedbackList = () => {
     };
 
     fetchFeedback();
-  }, []);
+  }, [eventId]); // Add eventId as a dependency
 
   return (
     <div className="w-full mx-auto p-4 sm:p-6 md:p-8">

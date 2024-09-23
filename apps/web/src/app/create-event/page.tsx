@@ -1,7 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
+import { getToken } from '@/lib/server';
+import { DecodedToken } from '@/type/user';
 
 
 const CreateEvent = () => {
@@ -25,6 +28,27 @@ const CreateEvent = () => {
     organizerId: '',
     category: ''
   });
+
+  const [hasExperience, setHasExperience] = useState(false);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const token = await getToken(); // Await the Promise
+      if (token) {
+        const decodedToken:DecodedToken = jwtDecode(token);
+        if (decodedToken.userType !== 'Organizer') {
+          router.push('/unauthorized')
+        } else {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            organizerId: decodedToken.id
+          }))
+        }
+      }
+    };
+
+    checkUser();
+  }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -244,18 +268,6 @@ const CreateEvent = () => {
             />
           </div>
         )}
-
-        <div>
-          <label className="block mb-2">Organizer ID</label>
-          <input
-            type="text"
-            name="organizerId"
-            value={formData.organizerId}
-            onChange={handleInputChange}
-            className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-            required
-          />
-        </div>
 
         {formData.isPaidEvent === 'Paid' && (
         <>

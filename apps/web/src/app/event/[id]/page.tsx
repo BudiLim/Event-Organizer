@@ -7,6 +7,8 @@ import { createTicket } from '@/lib/ticket';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 import { Event } from '@/type/user';
+import FeedbackForm from '@/app/feedback/page';
+import FeedbackList from '@/app/feedback-list/page';
 
 const DetailEvent = () => {
   const { id } = useParams();
@@ -163,6 +165,7 @@ const DetailEvent = () => {
     const singlePrice = event.price - singleDiscount;
 
     try {
+      setIsCreatingTicket(true);
       const { result, ok } = await createTicket(
         event.id,
         singlePrice,
@@ -172,6 +175,7 @@ const DetailEvent = () => {
         pointsToRedeem,
       );
       if (ok) {
+        setTicketSuccess('Ticket created successfully!');
         toast.success('Ticket created successfully!');
         setTicketSuccess('Ticket created successfully!');
       } else {
@@ -272,8 +276,7 @@ const DetailEvent = () => {
               <h1 className="font-semibold">General Admission</h1>
               <div className="flex justify-between w-full">
                 <h1>
-                  Rp.{' '}
-                  {(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
+                  Rp.{' '}{(event.price > 0 ? totalPrice : 0).toLocaleString('id-ID')},-
                 </h1>
                 <div className="flex items-center gap-3">
                   <FiMinusCircle onClick={minusCount} size={26} />
@@ -311,24 +314,23 @@ const DetailEvent = () => {
               <p>{pointsToRedeem} points will be redeemed</p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 items-center">
-            <h1 className="font-bold pr-4">
-              Total: Rp.{' '}
-              {(totalPrice > 0 ? totalPrice : 0).toLocaleString('id-ID')}
-              ,-
-            </h1>
-            <button
-              onClick={handlePurchase}
-              disabled={isCreatingTicket}
-              className="bg-blue-700 p-2 rounded-lg"
-            >
-              {isCreatingTicket ? 'Processing...' : 'Check Out'}
-            </button>
-            {ticketError && <p className="text-red-500">{ticketError}</p>}
-            {ticketSuccess && <p className="text-green-500">{ticketSuccess}</p>}
-          </div>
+          <button
+            className="bg-white text-black px-4 py-2 rounded-lg"
+            onClick={handlePurchase}
+            disabled={isCreatingTicket}
+          >
+            {isCreatingTicket ? 'Processing...' : 'Buy Ticket'}
+          </button>
+          {ticketError && (
+            <p className="text-red-500">{ticketError}</p>
+          )}
+          {ticketSuccess && (
+            <p className="text-green-500">{ticketSuccess}</p>
+          )}
         </div>
       </div>
+      <FeedbackForm eventId={`${id}`}/>
+      <FeedbackList eventId={`${id}`}/>
     </div>
   );
 };

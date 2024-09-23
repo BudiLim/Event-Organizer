@@ -133,9 +133,7 @@ export default function SearchBlog() {
         </div>
       </div>
 
-      <FeedbackForm/>
-      <FeedbackList/>
-
+    
 
     </div>
 

@@ -1,48 +1,52 @@
+import prisma from '@/prisma';
 import { Request, Response } from 'express';
-import prisma from '@/prisma'; // Adjust the path to your prisma instance
 
 export class FeedbackController {
+  // Create feedback for an event
   async createFeedback(req: Request, res: Response) {
     try {
-      const { message } = req.body;
+      const { message, eventId } = req.body;
 
-      if (!message) {
-        return res.status(400).json({ msg: 'Message is required' });
+      // Validate input
+      if (!message || !eventId) {
+        return res.status(400).json({ msg: 'Message and Event ID are required' });
       }
 
       // Create feedback
       const feedback = await prisma.feedback.create({
-        data: { message }
+        data: {
+          message,
+          eventId: Number(eventId), // Ensure eventId is a number
+        },
       });
 
-      // Fetch updated feedback list
-      const feedbackList = await prisma.feedback.findMany({
-        orderBy: { createdAt: 'desc' }
+      res.status(201).json({ feedback });
+    } catch (err) {
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
       });
-
-      res.status(201).json({ feedbackList });
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ msg: 'Internal server error', error: error.message });
-      } else {
-        res.status(500).json({ msg: 'Internal server error', error: 'Unknown error' });
-      }
     }
   }
 
-  async getFeedback(req: Request, res: Response) {
+  // Retrieve feedback for an event
+  async getFeedbackForEvent(req: Request, res: Response) {
     try {
-      const feedbackList = await prisma.feedback.findMany({
-        orderBy: { createdAt: 'desc' }
+      const { eventId } = req.params;
+
+      if (!eventId || isNaN(Number(eventId))) {
+        return res.status(400).json({ msg: 'Invalid event ID' });
+      }
+
+      const feedbacks = await prisma.feedback.findMany({
+        where: { eventId: Number(eventId) },
+        orderBy: { createdAt: 'desc' }, // Sort feedback by creation date
       });
 
-      res.status(200).json({ feedbackList });
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ msg: 'Internal server error', error: error.message });
-      } else {
-        res.status(500).json({ msg: 'Internal server error', error: 'Unknown error' });
-      }
+      res.status(200).json({ feedback: feedbacks });
+    } catch (err) {
+      res.status(400).json({
+        msg: err instanceof Error ? err.message : 'An error occurred',
+      });
     }
   }
 }
