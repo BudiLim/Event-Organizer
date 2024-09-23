@@ -1,18 +1,19 @@
-import { PrismaClient, Promotion } from '@prisma/client';
+import { Discount, PrismaClient, Promotion } from '@prisma/client';
 
 const prisma = new PrismaClient(); // Initialize Prisma client
 
 export class PromotionService {
+  // Promotion Code
   async applyDiscount(
     discountCode: string,
     eventId: number,
   ): Promise<{ amount: number } | null> {
     console.log(`Applying discount: ${discountCode} for event ${eventId}`);
-    
+
     // Validate the discount code
     const promotion = await this.validateDiscountCode(discountCode, eventId);
     console.log('Promotion:', promotion);
-  
+
     if (promotion) {
       if (this.isPromotionValid(promotion)) {
         if (this.isQuotaAvailable(promotion)) {
@@ -80,5 +81,45 @@ export class PromotionService {
     } catch (error) {
       console.error('Error updating promotion quota:', error);
     }
+  }
+
+  // VourcherCode
+  async applyVoucher(
+    voucherCode: string,
+    userId: number,
+  ): Promise<{ amount: number } | null> {
+    console.log(`Applying voucher: ${voucherCode} for user ${userId}`);
+
+    const voucher = await this.validateVoucherCode(voucherCode, userId);
+    console.log('Voucher:', voucher);
+
+    if (voucher && this.isVoucherValid(voucher)) {
+      // Return the discount amount from the valid voucher
+      return { amount: voucher.discountVoucher };
+    } else {
+      console.log('Voucher not valid or not found');
+      return null;
+    }
+  }
+
+  private async validateVoucherCode(
+    code: string,
+    userId: number,
+  ): Promise<Discount | null> {
+    try {
+      return await prisma.discount.findFirst({
+        where: {
+          voucherCode: code,
+          userId: userId,
+        },
+      });
+    } catch (error) {
+      console.error('Error validating voucher code:', error);
+      return null;
+    }
+  }
+
+  private isVoucherValid(voucher: Discount): boolean {
+    return voucher.validUntil > new Date(); // Check if the voucher is not expired
   }
 }

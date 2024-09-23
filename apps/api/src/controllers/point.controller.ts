@@ -131,4 +131,59 @@ export class PointsController {
       });
     }
   }
+
+  async usePoints(req: Request, res: Response) {
+    try {
+      const { userId, pointsToUse } = req.body;
+  
+      // Step 1: Fetch valid points (non-expired) for the user
+      const userPoints = await prisma.points.aggregate({
+        _sum: { points: true },
+        where: {
+          userId: userId,
+          expiresAt: {
+            gte: new Date(),  // Only consider valid, non-expired points
+          },
+        },
+      });
+  
+      const totalPoints = userPoints._sum.points || 0;
+  
+      // Step 2: Check if user has enough points
+      if (totalPoints < pointsToUse) {
+        return res.status(400).send({
+          status: 'error',
+          msg: 'Not enough points to complete the transaction.',
+        });
+      }
+  
+      // Step 3: Deduct points (you may need a more complex logic for partial point deduction)
+      await prisma.points.updateMany({
+        where: {
+          userId: userId,
+          expiresAt: {
+            gte: new Date(),  // Only deduct valid points
+          },
+        },
+        data: {
+          points: {
+            decrement: pointsToUse,
+          },
+        },
+      });
+  
+      return res.status(200).send({
+        status: 'ok',
+        msg: 'Points used successfully!',
+      });
+    } catch (err) {
+      console.error('Error using points:', err);
+      res.status(400).send({
+        status: 'error',
+        msg: 'An error occurred while using points.',
+      });
+    }
+  }
+  
+  
 }

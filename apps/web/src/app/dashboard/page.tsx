@@ -5,17 +5,36 @@ import { DashboardData, DecodedToken } from '@/type/user';
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import MyLineChart from '../chart/page';
+import MyLineChart from '@/app/chart/page';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,11 +55,7 @@ const Dashboard = () => {
         }
         const organizerId = decodedToken.id;
 
-        const { result, ok } = await getOrganizerDashboardData(
-          organizerId,
-          dateRange.startDate,
-          dateRange.endDate,
-        );
+        const { result, ok } = await getOrganizerDashboardData(organizerId);
 
         if (ok) {
           setData(result.data);
@@ -55,7 +70,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [dateRange]);
+  }, []);
 
   const calculatePercentageChange = (current: number, previous: number) => {
     if (previous === 0) return 'N/A';
@@ -81,6 +96,66 @@ const Dashboard = () => {
     data.totalTicketsSold,
     data.previousWeekTicketsSold,
   );
+
+  // Dynamic Chart Data
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const labels = monthNames; // This will use all months
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Revenue',
+        data: new Array(12).fill(0).map((_, index) => {
+          const monthData = data.monthlyRevenue.find(
+            (item) => item.month === index + 1,
+          );
+          return monthData ? monthData.revenue : 0;
+        }),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.2,
+      },
+    ],
+  };
+
+  const maxRevenue = Math.max(...chartData.datasets[0].data);
+  const gap = maxRevenue * 0.25; // 25% of the maximum revenue
+
+  const chartOptions = {
+    scales: {
+      y: {
+        title: {
+          display: true,
+          text: 'Revenue (in IDR)',
+        },
+        beginAtZero: true,
+        suggestedMin: 0, // You can also set this to a specific value if needed
+        suggestedMax: maxRevenue + gap, // Add 25% gap to the maximum value
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Month',
+        },
+      },
+    },
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
@@ -88,7 +163,7 @@ const Dashboard = () => {
         <h1 className="text-2xl font-bold">{data.fullName}</h1>
         <p className="text-3xl">My Dashboard</p>
       </header>
-      <div className='border border-slate-400'/>
+      <div className="border border-slate-400" />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 pt-5">
@@ -146,16 +221,12 @@ const Dashboard = () => {
       </div>
 
       {/* Chart Placeholder */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h2 className="text-lg font-bold mb-4">Report Statistics</h2>
-
-        
-        {/* Chart component will go here in future */}
-        <MyLineChart/>
-
-
-        <div className="h-64 bg-gray-200 flex items-center justify-center">
-          <p className="text-gray-600">Chart still on progress</p>
+      <div className="bg-white p-4 rounded-lg shadow mb-6 max-w-4xl mx-auto">
+        <h2 className="text-lg font-bold mb-4 text-center">
+          Report Statistics
+        </h2>
+        <div className="w-full h-64 md:h-96">
+          <Line data={chartData} options={chartOptions} />
         </div>
       </div>
 

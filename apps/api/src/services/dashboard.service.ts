@@ -1,15 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const getDashboardData = async (organizerId: number, startDate: Date, endDate: Date) => {
-  // Fetch events within the date range
+export const getDashboardData = async (organizerId: number) => {
+  const startDate = new Date('2024-01-01');
+  const endDate = new Date('2024-12-31');
+
+  // Fetch events organized by the user
   const events = await prisma.event.findMany({
     where: {
-      organizerId
+      organizerId,
     },
   });
 
-  // Calculate total revenue
+  // Calculate total revenue for 2024
   const totalRevenue = await prisma.transaction.aggregate({
     _sum: {
       amount: true,
@@ -25,7 +28,7 @@ export const getDashboardData = async (organizerId: number, startDate: Date, end
     },
   });
 
-  // Calculate total orders (total tickets sold)
+  // Calculate total orders (tickets sold) for 2024
   const totalOrders = await prisma.ticket.count({
     where: {
       event: {
@@ -38,7 +41,7 @@ export const getDashboardData = async (organizerId: number, startDate: Date, end
     },
   });
 
-  // Calculate previous week data
+  // Calculate previous week data for comparison
   const startOfLastWeek = new Date(startDate);
   startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
   const endOfLastWeek = new Date(endDate);
@@ -71,7 +74,7 @@ export const getDashboardData = async (organizerId: number, startDate: Date, end
     },
   });
 
-  // Count total tickets sold per event
+  // Count total tickets sold for each event
   const eventsWithTicketCounts = await Promise.all(
     events.map(async (event) => {
       const ticketsSold = await prisma.ticket.count({
@@ -90,11 +93,37 @@ export const getDashboardData = async (organizerId: number, startDate: Date, end
     })
   );
 
+  // Calculate monthly revenue for 2024
+  const monthlyRevenue = await prisma.transaction.groupBy({
+    by: ['transactionDate'],
+    _sum: {
+      amount: true,
+    },
+    where: {
+      event: {
+        organizerId,
+      },
+      transactionDate: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    orderBy: {
+      transactionDate: 'asc',
+    },
+  });
+
+  const monthlyRevenueArray = monthlyRevenue.map(({ transactionDate, _sum }) => ({
+    month: transactionDate.getMonth() + 1, // Get the month number (1-12)
+    revenue: _sum.amount || 0,             // Sum the revenue for that month
+  }));
+
   return {
     events: eventsWithTicketCounts,
     totalRevenue: totalRevenue._sum.amount || 0,
     totalOrders,
     previousWeekRevenue: previousWeekRevenue._sum.amount || 0,
     previousWeekTicketsSold,
+    monthlyRevenue: monthlyRevenueArray,
   };
 };

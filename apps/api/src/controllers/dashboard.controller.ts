@@ -8,15 +8,9 @@ export class DashboardController {
 
     if (isNaN(organizerId)) {
       console.error('Invalid organizer ID:', organizerIdParam);
-      return res.status(400).json({ status: 'error', message: 'Invalid organizer ID' });
-    }
-
-    const { startDate, endDate } = req.query;
-    const start = new Date(startDate as string);
-    const end = new Date(endDate as string);
-
-    if (!start || !end) {
-      return res.status(400).json({ status: 'error', message: 'Invalid date range' });
+      return res
+        .status(400)
+        .json({ status: 'error', message: 'Invalid organizer ID' });
     }
 
     try {
@@ -27,7 +21,9 @@ export class DashboardController {
       });
 
       if (!organizer) {
-        return res.status(404).json({ status: 'error', message: 'Organizer not found' });
+        return res
+          .status(404)
+          .json({ status: 'error', message: 'Organizer not found' });
       }
 
       const fullName = `${organizer.firstName} ${organizer.lastName}`;
@@ -35,44 +31,92 @@ export class DashboardController {
       // Fetch events organized by the user
       const events = await prisma.event.findMany({
         where: { organizerId },
-        // select: { id: true, name: true, location: true, isPaidEvent: true, price: true, availableSeats: true },
       });
 
-      // Calculate total revenue and orders
+      // Fetch transactions for the year 2024
       const transactions = await prisma.transaction.findMany({
-        where: { event: { organizerId } },
-        select: { amount: true },
+        where: {
+          event: { organizerId },
+          transactionDate: {
+            gte: new Date('2024-01-01'),
+            lte: new Date('2024-12-31'),
+          },
+        },
+        select: { amount: true, transactionDate: true },
       });
 
+      // Calculate total revenue and orders for the year 2024
       const totalRevenue = transactions.reduce(
         (sum: number, transaction: { amount: number }) => sum + transaction.amount,
-        0
+        0,
       );
       const totalOrders = transactions.length;
 
       // Count total tickets sold for events organized by the user
       const totalTicketsSold = await prisma.ticket.count({
-        where: { event: { organizerId } }
+        where: {
+          event: { organizerId },
+          purchaseDate: {
+            gte: new Date('2024-01-01'),
+            lte: new Date('2024-12-31'),
+          },
+        },
       });
 
       // Fetch previous week data for comparison
-      const previousWeekStart = new Date(start);
-      previousWeekStart.setDate(start.getDate() - 7);
-      const previousWeekEnd = new Date(end);
-      previousWeekEnd.setDate(end.getDate() - 7);
+      const previousWeekStart = new Date();
+      previousWeekStart.setDate(previousWeekStart.getDate() - 14);
+      const previousWeekEnd = new Date();
+      previousWeekEnd.setDate(previousWeekEnd.getDate() - 8);
 
       const previousWeekRevenueData = await prisma.transaction.findMany({
-        where: { event: { organizerId }, transactionDate: { gte: previousWeekStart, lte: previousWeekEnd } },
+        where: {
+          event: { organizerId },
+          transactionDate: { gte: previousWeekStart, lte: previousWeekEnd },
+        },
         select: { amount: true },
       });
 
       const previousWeekRevenue = previousWeekRevenueData.reduce(
         (sum: number, transaction: { amount: number }) => sum + transaction.amount,
-        0
+        0,
       );
       const previousWeekTicketsSold = await prisma.ticket.count({
-        where: { event: { organizerId }, purchaseDate: { gte: previousWeekStart, lte: previousWeekEnd } },
+        where: {
+          event: { organizerId },
+          purchaseDate: {
+            gte: previousWeekStart,
+            lte: previousWeekEnd,
+          },
+        },
       });
+
+      // Aggregate monthly revenue
+      const monthlyRevenueMap: Record<number, number> = {};
+
+      transactions.forEach(transaction => {
+        const month = transaction.transactionDate.getMonth() + 1; // 1-12 for Jan-Dec
+        if (!monthlyRevenueMap[month]) {
+          monthlyRevenueMap[month] = 0;
+        }
+        monthlyRevenueMap[month] += transaction.amount;
+      });
+
+      // Convert the map to an array for the frontend
+      const monthlyRevenueArray = Object.keys(monthlyRevenueMap).map(month => ({
+        month: parseInt(month),
+        revenue: monthlyRevenueMap[parseInt(month)], // Use parseInt to index correctly
+      }));
+
+      // Ensure to fill in missing months with 0 revenue
+      for (let month = 1; month <= 12; month++) {
+        if (!monthlyRevenueMap[month]) {
+          monthlyRevenueArray.push({ month, revenue: 0 });
+        }
+      }
+
+      // Sort by month
+      monthlyRevenueArray.sort((a, b) => a.month - b.month);
 
       return res.status(200).json({
         status: 'success',
@@ -85,6 +129,7 @@ export class DashboardController {
           previousWeekRevenue,
           previousWeekTicketsSold,
           previousWeekOrders: previousWeekTicketsSold,
+          monthlyRevenue: monthlyRevenueArray,
         },
       });
     } catch (error) {

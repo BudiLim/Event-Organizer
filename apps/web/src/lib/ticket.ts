@@ -46,7 +46,8 @@ export const createTicket = async (
   price: number, 
   quantity: number,
   totalAmount: number,
-  discountCode?: string
+  discountCode?: string,
+  pointsToRedeem?: number
 ) => {
   try {
     const token = await getToken();
@@ -78,6 +79,22 @@ export const createTicket = async (
   }
 };
 
+export const getUserPoints = async (userId: string) => {
+  const token = await getToken();
+
+  const res = await fetch(`${base_url}/points/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-cache',
+  });
+
+  const result = await res.json();
+  
+  return { result, ok: res.ok };
+};
 
 export interface ApplyDiscountResponse {
   discount?: {
@@ -107,4 +124,30 @@ export const applyDiscount = async (discountCode: string, eventId: number): Prom
   }
 };
 
+export interface ApplyVoucherResponse {
+  voucher?: {
+    amount: number;
+  };
+  message?: string;
+}
 
+export const applyVoucher = async (voucherCode: string, userId: number): Promise<ApplyVoucherResponse> => {
+  try {
+    const response = await fetch(`${base_url}/promotion/apply-voucher-code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ voucherCode, userId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to apply voucher');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error applying voucher:', error);
+    return { message: 'An error occurred while applying the voucher' };
+  }
+};
