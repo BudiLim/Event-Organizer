@@ -235,8 +235,8 @@ const DetailEvent = () => {
     return `${hours}:${minutes}`;
   };
   return (
-    <div className="flex justify-center items-center  w-full h-min-screen">
-      <div className="flex justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4">
+    <div className="flex flex-col justify-center items-center  w-full h-min-screen">
+      <div className="flex flex-col md:flex-row justify-center bg-black rounded-lg px-[300px] gap-[80px] p-4">
         <div className="shadow-sm shadow-white rounded-lg">
           {event.image ? (
             <Image
