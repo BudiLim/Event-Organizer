@@ -67,7 +67,7 @@ const MyVoucher = () => {
   };
 
   return (
-    <section className="relative w-full flex flex-col items-center py-5 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8 bg-black text-white">
+    <section className="relative w-full flex flex-col min-h-screen items-center py-5 md:py-8 lg:py-10 px-4 md:px-6 lg:px-8 bg-black text-white">
       <div className="w-full max-w-5xl bg-black text-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8">
         {/* Title */}
         <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-4 md:mb-6">

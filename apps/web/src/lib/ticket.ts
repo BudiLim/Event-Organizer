@@ -79,6 +79,22 @@ export const createTicket = async (
   }
 };
 
+export const getUserPoints = async (userId: string) => {
+  const token = await getToken();
+
+  const res = await fetch(`${base_url}/points/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-cache',
+  });
+
+  const result = await res.json();
+  
+  return { result, ok: res.ok };
+};
 
 export interface ApplyDiscountResponse {
   discount?: {
@@ -108,25 +124,30 @@ export const applyDiscount = async (discountCode: string, eventId: number): Prom
   }
 };
 
-export const getUserPoints = async (userId: string) => {
-  const token = await getToken();  // Ensure token is retrieved for authenticated API requests
+export interface ApplyVoucherResponse {
+  voucher?: {
+    amount: number;
+  };
+  message?: string;
+}
 
-  const res = await fetch(`${base_url}/points/${userId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,  // Include token for authorization
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-cache',
-  });
+export const applyVoucher = async (voucherCode: string, userId: number): Promise<ApplyVoucherResponse> => {
+  try {
+    const response = await fetch(`${base_url}/promotion/apply-voucher-code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ voucherCode, userId }),
+    });
 
-  const result = await res.json();
+    if (!response.ok) {
+      throw new Error('Failed to apply voucher');
+    }
 
-  if (res.ok) {
-    // Return the successful result, with points and expiration date
-    return { totalPoints: result.totalPoints, nearestExpiration: result.nearestExpiration };
-  } else {
-    console.error('Error fetching points:', result.msg);
-    return { totalPoints: 0, nearestExpiration: null };
+    return response.json();
+  } catch (error) {
+    console.error('Error applying voucher:', error);
+    return { message: 'An error occurred while applying the voucher' };
   }
 };

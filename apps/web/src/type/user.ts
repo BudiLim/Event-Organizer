@@ -39,7 +39,7 @@ export interface IUserState {
   userType: string;
   points: number;
   voucherCode: String;
-  discount: Discount
+  discount: Discount;
 }
 
 export interface Event {
@@ -59,6 +59,13 @@ export interface Event {
   organizer: {
     id: number;
     name: string;
+  };
+  discount: {
+    id: number;
+    userId: number;
+    discountVoucher: number;
+    voucherCode: string;
+    validUntil: string;
   };
 }
 

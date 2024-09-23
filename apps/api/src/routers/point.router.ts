@@ -16,7 +16,7 @@ export class PointsRouter {
     // Protected routes
     this.router.post('/', verifyToken, checkExperience, this.pointsController.createPoints);
     this.router.get('/:id/history', verifyToken, checkExperience, this.pointsController.getPointsHistory);
-    this.router.get('/:userId/', verifyToken, checkExperience, this.pointsController.getUserPoints);
+    this.router.get('/:userId/', verifyToken, checkExperience, this.pointsController.getMyPoints);
     this.router.post('/use', verifyToken, checkExperience, this.pointsController.usePoints);
   }
 
